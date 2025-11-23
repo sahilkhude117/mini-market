@@ -29,11 +29,11 @@ pub fn token_transfer<'a>(
     amount: u64,
 ) -> Result<()> {
     let cpi_ctx: CpiContext<_> = CpiContext::new_with_signer(
-        token_program.to_account_info(),
+        token_program,
         token::Transfer {
             from: from_ata,
-            authority: authority.to_account_info(),
             to: to_ata,
+            authority: authority,
         },
         singer_seed,
     );

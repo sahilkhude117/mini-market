@@ -10,7 +10,6 @@ pub mod utils;
 
 use instructions::{
     betting::*, create_market::*, deposit_liquidity::*, get_oracle_res::*, init::*, token_mint::*,
-    withdraw::*,
 };
 use states::{
     global::GlobalParams,

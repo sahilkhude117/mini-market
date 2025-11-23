@@ -1,0 +1,12 @@
+Error: Function _ZN4core5slice4sort6stable14driftsort_main17h565f9dc48c99163aE Stack offset of 4104 exceeded max offset of 4096 by 8 bytes, please minimize large stack variables. Estimated function frame size: 4160 bytes. Exceeding the maximum stack offset may cause undefined behavior during execution.
+
+Error: Function _ZN4core5slice4sort6stable14driftsort_main17haf427b25ece72e36E Stack offset of 4112 exceeded max offset of 4096 by 16 bytes, please minimize large stack variables. Estimated function frame size: 4160 bytes. Exceeding the maximum stack offset may cause undefined behavior during execution.
+
+Error: A function call in method _ZN4core5slice4sort6stable14driftsort_main17haf427b25ece72e36E overwrites values in the frame. Please, decrease stack usage or remove parameters from the call.The function call may cause undefined behavior during execution.
+
+Error: A function call in method _ZN4core5slice4sort6stable14driftsort_main17haf427b25ece72e36E overwrites values in the frame. Please, decrease stack usage or remove parameters from the call.The function call may cause undefined behavior during execution.
+
+Error: A function call in method _ZN4core5slice4sort6stable14driftsort_main17haf427b25ece72e36E overwrites values in the frame. Please, decrease stack usage or remove parameters from the call.The function call may cause undefined behavior during execution.
+
+Error: A function call in method _ZN4core5slice4sort6stable14driftsort_main17haf427b25ece72e36E overwrites values in the frame. Please, decrease stack usage or remove parameters from the call.The function call may cause undefined behavior during execution.
+

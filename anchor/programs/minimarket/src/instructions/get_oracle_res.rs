@@ -25,6 +25,7 @@ pub struct GetOracleRes<'info> {
 
     /// CHECK: via switchboard sdk
     pub feed: AccountInfo<'info>,
+    pub clock: Sysvar<'info, Clock>,
     pub system_program: Program<'info, System>,
 }
 
@@ -35,10 +36,11 @@ pub fn get_oracle_res(ctx: Context<GetOracleRes>) -> Result<()> {
     let feed: std::cell::Ref<'_, PullFeedAccountData> =
         PullFeedAccountData::parse(feed_account).unwrap();
 
-    msg!("🎫price 🎫 {:?}", feed.value());
+    let clock_slot = ctx.accounts.clock.slot;
+    msg!("🎫price 🎫 {:?}", feed.value(clock_slot));
     msg!("🎫range 🎫 {:?}", market.range);
 
-    let feed_value: f64 = feed.value().unwrap().try_into().unwrap();
+    let feed_value: f64 = feed.value(clock_slot).unwrap().try_into().unwrap();
 
     market.result = if market.range == 0 && market.value > feed_value {
         true
@@ -53,7 +55,7 @@ pub fn get_oracle_res(ctx: Context<GetOracleRes>) -> Result<()> {
     msg!("🎫result 🎫 {:?}", ctx.accounts.market.result);
 
     emit!(OracleResUpdated {
-        oracle_res: feed.value().unwrap().try_into().unwrap(),
+        oracle_res: feed.value(clock_slot).unwrap().try_into().unwrap(),
     });
     Ok(())
 }

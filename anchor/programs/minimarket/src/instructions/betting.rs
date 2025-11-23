@@ -2,7 +2,7 @@ use crate::constants::GLOBAL_SEED;
 use crate::errors::ContractError;
 use crate::states::{global::*, market::*};
 use anchor_lang::{prelude::*, solana_program};
-use anchor_spl::token::{Mint, TokenAccount, Token};
+use anchor_spl::token::{Mint, Token, TokenAccount};
 use crate::utils::token_transfer;
 use crate::events::BettingEvent;
 
@@ -107,7 +107,7 @@ impl Betting<'_> {
             ctx.accounts.pda_token_account.to_account_info(),
             ctx.accounts.user_token_account.to_account_info(),
             market.to_account_info(),
-            ctx.accounts.token_mint.to_account_info(),
+            ctx.accounts.token_program.to_account_info(),
             mint_auth_signer_seeds,
             token_amount,
         )?;

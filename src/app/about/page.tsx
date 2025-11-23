@@ -76,9 +76,9 @@ export default function AboutPage() {
             Earn rewards by referring friends to the platform:
           </p>
           <ul className="list-disc list-inside space-y-2 text-gray-700">
-            <li>Level 0: Earn 0.35% of direct referrals' trading fees</li>
-            <li>Level 1: Earn 0.1% of second-level referrals' fees</li>
-            <li>Level 2: Earn 0.05% of third-level referrals' fees</li>
+            <li>Level 0: Earn 0.35% of direct referrals&apos; trading fees</li>
+            <li>Level 1: Earn 0.1% of second-level referrals&apos; fees</li>
+            <li>Level 2: Earn 0.05% of third-level referrals&apos; fees</li>
           </ul>
           <Link
             href="/referral"

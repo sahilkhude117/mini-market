@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     console.log(player, market_id, amount, isYes);
 
-    let sol_amount = isYes ? token_a_price * amount : token_b_price * amount;
+    const sol_amount = isYes ? token_a_price * amount : token_b_price * amount;
 
     const result = await MarketModel.findByIdAndUpdate(
       market_id,

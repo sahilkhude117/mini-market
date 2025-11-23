@@ -34,4 +34,8 @@ pub mod minimarket {
     pub fn init_market(ctx: Context<CreateMarket>, params: MarketParams) -> Result<()> {
         CreateMarket::create_market(ctx, params)
     }
+
+    pub fn add_liquidity(ctx: Context<DepositLiquidity>, amount: u64) -> Result<()> {
+        deposit_liquidity(ctx, amount)
+    }
 }

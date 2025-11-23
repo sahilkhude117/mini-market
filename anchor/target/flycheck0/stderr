@@ -1,6 +1,6 @@
-   1.533356799s  INFO prepare_target{force=false package_id=minimarket v0.1.0 (/mnt/e/Hackthons/Indie.fun/mini-market/anchor/programs/minimarket) target="minimarket"}: cargo::core::compiler::fingerprint: dependency on `build_script_build` is newer than we are 1763889061.705037200s > 1763888933.000000000s "/home/sahil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libsecp256k1-0.6.0"
-   1.642611357s  INFO prepare_target{force=false package_id=minimarket v0.1.0 (/mnt/e/Hackthons/Indie.fun/mini-market/anchor/programs/minimarket) target="minimarket"}: cargo::core::compiler::fingerprint: fingerprint error for minimarket v0.1.0 (/mnt/e/Hackthons/Indie.fun/mini-market/anchor/programs/minimarket)/Check { test: false }/TargetInner { ..: lib_target("minimarket", ["cdylib", "lib"], "/mnt/e/Hackthons/Indie.fun/mini-market/anchor/programs/minimarket/src/lib.rs", Edition2021) }
-   1.642663789s  INFO prepare_target{force=false package_id=minimarket v0.1.0 (/mnt/e/Hackthons/Indie.fun/mini-market/anchor/programs/minimarket) target="minimarket"}: cargo::core::compiler::fingerprint:     err: failed to read `/mnt/e/Hackthons/Indie.fun/mini-market/anchor/target/debug/.fingerprint/minimarket-7057b2f36ddac99c/lib-minimarket`
+   1.155003754s  INFO prepare_target{force=false package_id=minimarket v0.1.0 (/mnt/e/Hackthons/Indie.fun/mini-market/anchor/programs/minimarket) target="minimarket"}: cargo::core::compiler::fingerprint: dependency on `build_script_build` is newer than we are 1763889061.705037200s > 1763888933.000000000s "/home/sahil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libsecp256k1-0.6.0"
+   1.255302063s  INFO prepare_target{force=false package_id=minimarket v0.1.0 (/mnt/e/Hackthons/Indie.fun/mini-market/anchor/programs/minimarket) target="minimarket"}: cargo::core::compiler::fingerprint: fingerprint error for minimarket v0.1.0 (/mnt/e/Hackthons/Indie.fun/mini-market/anchor/programs/minimarket)/Check { test: false }/TargetInner { ..: lib_target("minimarket", ["cdylib", "lib"], "/mnt/e/Hackthons/Indie.fun/mini-market/anchor/programs/minimarket/src/lib.rs", Edition2021) }
+   1.255356314s  INFO prepare_target{force=false package_id=minimarket v0.1.0 (/mnt/e/Hackthons/Indie.fun/mini-market/anchor/programs/minimarket) target="minimarket"}: cargo::core::compiler::fingerprint:     err: failed to read `/mnt/e/Hackthons/Indie.fun/mini-market/anchor/target/debug/.fingerprint/minimarket-7057b2f36ddac99c/lib-minimarket`
 
 Caused by:
     No such file or directory (os error 2)
@@ -42,8 +42,8 @@ Stack backtrace:
   24: <unknown>
   25: __libc_start_main
   26: <unknown>
-   1.653162743s  INFO prepare_target{force=false package_id=anchor-lang v0.31.1 target="anchor_lang"}: cargo::core::compiler::fingerprint: fingerprint error for anchor-lang v0.31.1/Check { test: false }/TargetInner { ..: lib_target("anchor_lang", ["lib"], "/home/sahil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anchor-lang-0.31.1/src/lib.rs", Edition2021) }
-   1.653198073s  INFO prepare_target{force=false package_id=anchor-lang v0.31.1 target="anchor_lang"}: cargo::core::compiler::fingerprint:     err: failed to read `/mnt/e/Hackthons/Indie.fun/mini-market/anchor/target/debug/.fingerprint/anchor-lang-bbb2303f8a188c49/lib-anchor_lang`
+   1.264808180s  INFO prepare_target{force=false package_id=anchor-lang v0.31.1 target="anchor_lang"}: cargo::core::compiler::fingerprint: fingerprint error for anchor-lang v0.31.1/Check { test: false }/TargetInner { ..: lib_target("anchor_lang", ["lib"], "/home/sahil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anchor-lang-0.31.1/src/lib.rs", Edition2021) }
+   1.264846713s  INFO prepare_target{force=false package_id=anchor-lang v0.31.1 target="anchor_lang"}: cargo::core::compiler::fingerprint:     err: failed to read `/mnt/e/Hackthons/Indie.fun/mini-market/anchor/target/debug/.fingerprint/anchor-lang-bbb2303f8a188c49/lib-anchor_lang`
 
 Caused by:
     No such file or directory (os error 2)
@@ -86,8 +86,8 @@ Stack backtrace:
   25: <unknown>
   26: __libc_start_main
   27: <unknown>
-   1.995661058s  INFO prepare_target{force=false package_id=solana-program v2.2.1 target="solana_program"}: cargo::core::compiler::fingerprint: fingerprint error for solana-program v2.2.1/Check { test: false }/TargetInner { ..: lib_target("solana_program", ["cdylib", "rlib"], "/home/sahil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-program-2.2.1/src/lib.rs", Edition2021) }
-   1.995708344s  INFO prepare_target{force=false package_id=solana-program v2.2.1 target="solana_program"}: cargo::core::compiler::fingerprint:     err: failed to read `/mnt/e/Hackthons/Indie.fun/mini-market/anchor/target/debug/.fingerprint/solana-program-bf48a9a86fe88d91/lib-solana_program`
+   1.575953786s  INFO prepare_target{force=false package_id=solana-program v2.2.1 target="solana_program"}: cargo::core::compiler::fingerprint: fingerprint error for solana-program v2.2.1/Check { test: false }/TargetInner { ..: lib_target("solana_program", ["cdylib", "rlib"], "/home/sahil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-program-2.2.1/src/lib.rs", Edition2021) }
+   1.576003990s  INFO prepare_target{force=false package_id=solana-program v2.2.1 target="solana_program"}: cargo::core::compiler::fingerprint:     err: failed to read `/mnt/e/Hackthons/Indie.fun/mini-market/anchor/target/debug/.fingerprint/solana-program-bf48a9a86fe88d91/lib-solana_program`
 
 Caused by:
     No such file or directory (os error 2)
@@ -131,8 +131,8 @@ Stack backtrace:
   26: <unknown>
   27: __libc_start_main
   28: <unknown>
-   2.472514899s  INFO prepare_target{force=false package_id=solana-secp256k1-recover v2.2.1 target="solana_secp256k1_recover"}: cargo::core::compiler::fingerprint: fingerprint error for solana-secp256k1-recover v2.2.1/Check { test: false }/TargetInner { ..: lib_target("solana_secp256k1_recover", ["lib"], "/home/sahil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-secp256k1-recover-2.2.1/src/lib.rs", Edition2021) }
-   2.472556641s  INFO prepare_target{force=false package_id=solana-secp256k1-recover v2.2.1 target="solana_secp256k1_recover"}: cargo::core::compiler::fingerprint:     err: failed to read `/mnt/e/Hackthons/Indie.fun/mini-market/anchor/target/debug/.fingerprint/solana-secp256k1-recover-6ba22cd9766d09d3/lib-solana_secp256k1_recover`
+   2.085074180s  INFO prepare_target{force=false package_id=solana-secp256k1-recover v2.2.1 target="solana_secp256k1_recover"}: cargo::core::compiler::fingerprint: fingerprint error for solana-secp256k1-recover v2.2.1/Check { test: false }/TargetInner { ..: lib_target("solana_secp256k1_recover", ["lib"], "/home/sahil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-secp256k1-recover-2.2.1/src/lib.rs", Edition2021) }
+   2.085120443s  INFO prepare_target{force=false package_id=solana-secp256k1-recover v2.2.1 target="solana_secp256k1_recover"}: cargo::core::compiler::fingerprint:     err: failed to read `/mnt/e/Hackthons/Indie.fun/mini-market/anchor/target/debug/.fingerprint/solana-secp256k1-recover-6ba22cd9766d09d3/lib-solana_secp256k1_recover`
 
 Caused by:
     No such file or directory (os error 2)
@@ -177,8 +177,8 @@ Stack backtrace:
   27: <unknown>
   28: __libc_start_main
   29: <unknown>
-   2.477602552s  INFO prepare_target{force=false package_id=libsecp256k1 v0.6.0 target="libsecp256k1"}: cargo::core::compiler::fingerprint: fingerprint error for libsecp256k1 v0.6.0/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("libsecp256k1", ["lib"], "/home/sahil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libsecp256k1-0.6.0/src/lib.rs", Edition2018) }
-   2.477634986s  INFO prepare_target{force=false package_id=libsecp256k1 v0.6.0 target="libsecp256k1"}: cargo::core::compiler::fingerprint:     err: failed to read `/mnt/e/Hackthons/Indie.fun/mini-market/anchor/target/debug/.fingerprint/libsecp256k1-e65cb417f8d153d8/lib-libsecp256k1`
+   2.088941285s  INFO prepare_target{force=false package_id=libsecp256k1 v0.6.0 target="libsecp256k1"}: cargo::core::compiler::fingerprint: fingerprint error for libsecp256k1 v0.6.0/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("libsecp256k1", ["lib"], "/home/sahil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libsecp256k1-0.6.0/src/lib.rs", Edition2018) }
+   2.088987413s  INFO prepare_target{force=false package_id=libsecp256k1 v0.6.0 target="libsecp256k1"}: cargo::core::compiler::fingerprint:     err: failed to read `/mnt/e/Hackthons/Indie.fun/mini-market/anchor/target/debug/.fingerprint/libsecp256k1-e65cb417f8d153d8/lib-libsecp256k1`
 
 Caused by:
     No such file or directory (os error 2)
@@ -224,10 +224,10 @@ Stack backtrace:
   28: <unknown>
   29: __libc_start_main
   30: <unknown>
-   2.499645095s  INFO prepare_target{force=false package_id=libsecp256k1 v0.6.0 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint dirty for libsecp256k1 v0.6.0/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "/home/sahil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libsecp256k1-0.6.0/build.rs", Edition2018) }
-   2.499694454s  INFO prepare_target{force=false package_id=libsecp256k1 v0.6.0 target="build-script-build"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDependency { name: "build_script_build", dep_mtime: FileTime { seconds: 1763889061, nanos: 705037200 }, max_mtime: FileTime { seconds: 1763888933, nanos: 0 } })
-   2.634826552s  INFO prepare_target{force=false package_id=minimarket v0.1.0 (/mnt/e/Hackthons/Indie.fun/mini-market/anchor/programs/minimarket) target="minimarket"}: cargo::core::compiler::fingerprint: fingerprint error for minimarket v0.1.0 (/mnt/e/Hackthons/Indie.fun/mini-market/anchor/programs/minimarket)/Check { test: true }/TargetInner { ..: lib_target("minimarket", ["cdylib", "lib"], "/mnt/e/Hackthons/Indie.fun/mini-market/anchor/programs/minimarket/src/lib.rs", Edition2021) }
-   2.634880826s  INFO prepare_target{force=false package_id=minimarket v0.1.0 (/mnt/e/Hackthons/Indie.fun/mini-market/anchor/programs/minimarket) target="minimarket"}: cargo::core::compiler::fingerprint:     err: failed to read `/mnt/e/Hackthons/Indie.fun/mini-market/anchor/target/debug/.fingerprint/minimarket-c19ec1edd7da5aa0/test-lib-minimarket`
+   2.113572521s  INFO prepare_target{force=false package_id=libsecp256k1 v0.6.0 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint dirty for libsecp256k1 v0.6.0/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "/home/sahil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libsecp256k1-0.6.0/build.rs", Edition2018) }
+   2.113678354s  INFO prepare_target{force=false package_id=libsecp256k1 v0.6.0 target="build-script-build"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDependency { name: "build_script_build", dep_mtime: FileTime { seconds: 1763889061, nanos: 705037200 }, max_mtime: FileTime { seconds: 1763888933, nanos: 0 } })
+   2.258003503s  INFO prepare_target{force=false package_id=minimarket v0.1.0 (/mnt/e/Hackthons/Indie.fun/mini-market/anchor/programs/minimarket) target="minimarket"}: cargo::core::compiler::fingerprint: fingerprint error for minimarket v0.1.0 (/mnt/e/Hackthons/Indie.fun/mini-market/anchor/programs/minimarket)/Check { test: true }/TargetInner { ..: lib_target("minimarket", ["cdylib", "lib"], "/mnt/e/Hackthons/Indie.fun/mini-market/anchor/programs/minimarket/src/lib.rs", Edition2021) }
+   2.258053882s  INFO prepare_target{force=false package_id=minimarket v0.1.0 (/mnt/e/Hackthons/Indie.fun/mini-market/anchor/programs/minimarket) target="minimarket"}: cargo::core::compiler::fingerprint:     err: failed to read `/mnt/e/Hackthons/Indie.fun/mini-market/anchor/target/debug/.fingerprint/minimarket-c19ec1edd7da5aa0/test-lib-minimarket`
 
 Caused by:
     No such file or directory (os error 2)

@@ -30,4 +30,5 @@ pub mod minimarket {
     pub fn get_res(ctx: Context<GetOracleRes>) -> Result<()> {
         get_oracle_res(ctx)
     }
+    
 }

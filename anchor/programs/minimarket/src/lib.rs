@@ -38,4 +38,8 @@ pub mod minimarket {
     pub fn add_liquidity(ctx: Context<DepositLiquidity>, amount: u64) -> Result<()> {
         deposit_liquidity(ctx, amount)
     }
+
+    pub fn create_bet(ctx: Context<Betting>, params: BettingParams) -> Result<()> {
+        Betting::betting(ctx, params)
+    }
 }

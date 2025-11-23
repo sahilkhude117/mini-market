@@ -8,12 +8,15 @@ skip-lint = false
 [programs.localnet]
 minimarket = "Count3AcZucFDPSFBAeHkQ6AvttieKUkyJ8HiQGhQwe"
 
+[programs.devnet]
+minimarket = "2F4mpMnSUMDuhMwFnXAgz7xf7V2zYWPFzU12EAGxk8do"
+
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
-test = "yarn --cwd .. vitest run tests/"
+test = "yarn --cwd .. vitest run anchor/tests/"

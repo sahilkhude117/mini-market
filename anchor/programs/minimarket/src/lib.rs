@@ -16,7 +16,7 @@ use states::{
     market::{BettingParams, MarketParams},
 };
 
-declare_id!("Count3AcZucFDPSFBAeHkQ6AvttieKUkyJ8HiQGhQwe");
+declare_id!("2F4mpMnSUMDuhMwFnXAgz7xf7V2zYWPFzU12EAGxk8do");
 
 #[program]
 pub mod minimarket {

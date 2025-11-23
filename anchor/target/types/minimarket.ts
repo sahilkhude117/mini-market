@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/minimarket.json`.
  */
 export type Minimarket = {
-  "address": "Count3AcZucFDPSFBAeHkQ6AvttieKUkyJ8HiQGhQwe",
+  "address": "2F4mpMnSUMDuhMwFnXAgz7xf7V2zYWPFzU12EAGxk8do",
   "metadata": {
     "name": "minimarket",
     "version": "0.1.0",

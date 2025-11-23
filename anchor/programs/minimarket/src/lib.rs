@@ -26,4 +26,8 @@ pub mod minimarket {
     pub fn initialize(ctx: Context<Initialize>, params: GlobalParams) -> Result<()> {
         init(ctx, params)
     }
+
+    pub fn get_res(ctx: Context<GetOracleRes>) -> Result<()> {
+        get_oracle_res(ctx)
+    }
 }

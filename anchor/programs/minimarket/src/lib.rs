@@ -30,5 +30,8 @@ pub mod minimarket {
     pub fn get_res(ctx: Context<GetOracleRes>) -> Result<()> {
         get_oracle_res(ctx)
     }
-    
+
+    pub fn init_market(ctx: Context<CreateMarket>, params: MarketParams) -> Result<()> {
+        CreateMarket::create_market(ctx, params)
+    }
 }

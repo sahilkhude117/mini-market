@@ -9,7 +9,7 @@ pub mod states;
 pub mod utils;
 
 use instructions::{
-    betting::*, create_market::*, deposite_liquidity::*, get_oracle_res::*, init::*, token_mint::*,
+    betting::*, create_market::*, deposit_liquidity::*, get_oracle_res::*, init::*, token_mint::*,
     withdraw::*,
 };
 use states::{
@@ -41,5 +41,9 @@ pub mod minimarket {
 
     pub fn create_bet(ctx: Context<Betting>, params: BettingParams) -> Result<()> {
         Betting::betting(ctx, params)
+    }
+
+    pub fn mint_token(ctx: Context<TokenMint>, market_id: String) -> Result<()> {
+        TokenMint::token_mint(ctx, market_id)
     }
 }

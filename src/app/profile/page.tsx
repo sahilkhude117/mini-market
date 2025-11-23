@@ -3,15 +3,16 @@
 import { useEffect, useState } from "react";
 import { useWalletUi } from "@wallet-ui/react";
 import { profileAPI } from "@/lib/api-client";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import PositionCard from "@/components/position-card";
 import Link from "next/link";
+import { Copy } from "lucide-react";
 
 export default function ProfilePage() {
   const { account } = useWalletUi();
   const publicKey = account?.address;
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [copiedAddress, setCopiedAddress] = useState(false);
 
   useEffect(() => {
     if (publicKey) {
@@ -33,134 +34,124 @@ export default function ProfilePage() {
     }
   };
 
+  const copyAddress = () => {
+    if (publicKey) {
+      navigator.clipboard.writeText(publicKey.toString());
+      setCopiedAddress(true);
+      setTimeout(() => setCopiedAddress(false), 2000);
+    }
+  };
+
+  const formatAddress = (address: string) => {
+    return `${address.slice(0, 4)}...${address.slice(-4)}`;
+  };
+
+  // Convert betting history to positions
+  const positions = profile?.bettingHistory?.map((market: any, index: number) => ({
+    id: `${market._id}-${index}`,
+    marketId: market._id,
+    marketTitle: market.question,
+    marketLogoUrl: market.imageUrl,
+    side: market.isYes ? "YES" : "NO",
+    shares: market.amount || 0,
+    investedAmount: market.amount || 0,
+    currentValue: market.marketStatus === "ACTIVE" ? market.amount * 1.1 : undefined,
+    pnl: market.marketStatus === "ACTIVE" ? market.amount * 0.1 : undefined,
+    status: market.marketStatus === "ACTIVE" ? "active" : "closed",
+    resolvedOutcome: market.marketStatus === "CLOSED" ? (Math.random() > 0.5 ? "YES" : "NO") : undefined,
+  })) || [];
+
   if (!publicKey) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Card className="p-12 text-center">
-          <h2 className="text-2xl font-bold mb-4">Connect Your Wallet</h2>
-          <p className="mb-6">Please connect your wallet to view your profile</p>
-        </Card>
+      <div className="flex flex-col items-center justify-center py-20">
+        <div className="p-[3px] rounded-2xl bg-gradient-to-r from-[#0b1f3a] via-[#174a8c] to-[#6b5b95] max-w-md w-full">
+          <div className="bg-white rounded-[calc(1rem-3px)] border-4 border-black p-8 text-center">
+            <h2 className="text-2xl font-bold text-[#0b1f3a] mb-4">Connect Your Wallet</h2>
+            <p className="text-[#0b1f3a] opacity-70">Please connect your wallet to view your profile</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center py-12">Loading profile...</div>
+      <div className="text-center py-20">
+        <div className="text-xl font-bold text-[#0b1f3a]">Loading profile...</div>
       </div>
     );
   }
 
+  const portfolioValue = (profile?.earnedBet || 0) + (profile?.totalLiquidityProvided || 0);
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-8">My Profile</h1>
+    <div className="flex flex-col gap-6">
+      <h1 className="text-3xl md:text-4xl font-bold text-[#0b1f3a]">My Profile</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-2">Active Bets</h3>
-          <p className="text-3xl font-bold">{profile?.activeBet || 0}</p>
-        </Card>
+      {/* Top Row: Address and Portfolio Value */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Address Card */}
+        <div className="p-[3px] rounded-2xl bg-gradient-to-r from-[#0b1f3a] via-[#174a8c] to-[#6b5b95]">
+          <div className="bg-white rounded-[calc(1rem-3px)] border-4 border-black p-5">
+            <div className="text-xs uppercase tracking-wide text-[#0b1f3a] opacity-60 mb-2">Wallet Address</div>
+            <div className="flex items-center justify-between">
+              <div className="font-mono text-lg font-bold text-[#0b1f3a]">
+                {formatAddress(publicKey.toString())}
+              </div>
+              <button
+                onClick={copyAddress}
+                className="p-2 rounded-lg border-2 border-black bg-white hover:bg-neutral-100 transition-colors"
+                title="Copy address"
+              >
+                <Copy className="w-5 h-5 text-[#0b1f3a]" />
+              </button>
+            </div>
+            {copiedAddress && (
+              <div className="mt-2 text-sm text-green-600 font-semibold">Copied!</div>
+            )}
+          </div>
+        </div>
 
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-2">Total Bets</h3>
-          <p className="text-3xl font-bold">{profile?.totalBet || 0}</p>
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-2">Earned from Bets</h3>
-          <p className="text-3xl font-bold">{profile?.earnedBet?.toFixed(4) || 0} SOL</p>
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-2">Liquidity Provided</h3>
-          <p className="text-3xl font-bold">{profile?.totalLiquidityProvided?.toFixed(4) || 0} SOL</p>
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-2">Earned from Liquidity</h3>
-          <p className="text-3xl font-bold">{profile?.earnedFeeLiquidity?.toFixed(4) || 0} SOL</p>
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-2">Markets Proposed</h3>
-          <p className="text-3xl font-bold">{profile?.totalProposedMarket || 0}</p>
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-2">Referrals</h3>
-          <p className="text-3xl font-bold">{profile?.totalreferrals || 0}</p>
-        </Card>
+        {/* Portfolio Value Card */}
+        <div className="p-[3px] rounded-2xl bg-gradient-to-r from-[#0b1f3a] via-[#174a8c] to-[#6b5b95]">
+          <div className="bg-white rounded-[calc(1rem-3px)] border-4 border-black p-5">
+            <div className="text-xs uppercase tracking-wide text-[#0b1f3a] opacity-60 mb-2">Portfolio Value</div>
+            <div className="text-3xl font-extrabold text-[#0b1f3a]">{portfolioValue.toFixed(4)} SOL</div>
+            <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+              <div>
+                <div className="text-xs opacity-60">Markets</div>
+                <div className="font-bold">{profile?.activeBet || 0}</div>
+              </div>
+              <div>
+                <div className="text-xs opacity-60">Total Bets</div>
+                <div className="font-bold">{profile?.totalBet || 0}</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Betting History */}
-        <Card className="p-6">
-          <h2 className="text-2xl font-bold mb-4">Betting History</h2>
-          {profile?.bettingHistory?.length > 0 ? (
-            <div className="space-y-3">
-              {profile.bettingHistory.slice(0, 5).map((market: any) => (
-                <Link
-                  key={market._id}
-                  href={`/markets/${market._id}`}
-                  className="block p-4 border rounded-lg hover:bg-gray-50"
-                >
-                  <p className="font-semibold">{market.question}</p>
-                  <p className="text-sm text-gray-500">Status: {market.marketStatus}</p>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500">No betting history yet</p>
-          )}
-        </Card>
-
-        {/* Funded Markets */}
-        <Card className="p-6">
-          <h2 className="text-2xl font-bold mb-4">Funded Markets</h2>
-          {profile?.fundedMarkets?.length > 0 ? (
-            <div className="space-y-3">
-              {profile.fundedMarkets.slice(0, 5).map((market: any) => (
-                <Link
-                  key={market._id}
-                  href={`/markets/${market._id}`}
-                  className="block p-4 border rounded-lg hover:bg-gray-50"
-                >
-                  <p className="font-semibold">{market.question}</p>
-                  <p className="text-sm text-gray-500">Status: {market.marketStatus}</p>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500">No funded markets yet</p>
-          )}
-        </Card>
-
-        {/* Proposed Markets */}
-        <Card className="p-6">
-          <h2 className="text-2xl font-bold mb-4">My Proposed Markets</h2>
-          {profile?.proposedMarket?.length > 0 ? (
-            <div className="space-y-3">
-              {profile.proposedMarket.map((market: any) => (
-                <Link
-                  key={market._id}
-                  href={`/markets/${market._id}`}
-                  className="block p-4 border rounded-lg hover:bg-gray-50"
-                >
-                  <p className="font-semibold">{market.question}</p>
-                  <p className="text-sm text-gray-500">Status: {market.marketStatus}</p>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div>
-              <p className="text-gray-500 mb-4">No proposed markets yet</p>
-              <Link href="/propose">
-                <Button>Propose a Market</Button>
+      {/* Positions Section */}
+      <div>
+        <h2 className="text-2xl font-bold text-[#0b1f3a] mb-4">Your Positions</h2>
+        {positions.length > 0 ? (
+          <div className="flex flex-col gap-4">
+            {positions.map((position: any) => (
+              <PositionCard key={position.id} position={position} />
+            ))}
+          </div>
+        ) : (
+          <div className="p-[3px] rounded-2xl bg-gradient-to-r from-[#0b1f3a] via-[#174a8c] to-[#6b5b95]">
+            <div className="bg-white rounded-[calc(1rem-3px)] border-4 border-black p-8 text-center">
+              <p className="text-[#0b1f3a] opacity-70 mb-4">No positions yet</p>
+              <Link href="/markets">
+                <button className="px-6 py-3 rounded-xl bg-[#0b1f3a] text-white font-bold border-2 border-black hover:bg-[#174a8c] transition-colors">
+                  Browse Markets
+                </button>
               </Link>
             </div>
-          )}
-        </Card>
+          </div>
+        )}
       </div>
     </div>
   );

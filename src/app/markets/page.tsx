@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { useGlobalContext, MarketDataType } from "@/lib/contexts/GlobalContext";
 import { marketAPI } from "@/lib/api-client";
-import { getCountDown, formatNumber } from "@/lib/prediction-utils";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import MarketPreviewCard from "@/components/market-preview-card";
+import { toMarketPreview } from "@/lib/data-adapters";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function MarketsPage() {
   const { activeTab, markets, setActiveTab, formatMarketData } = useGlobalContext();
@@ -24,7 +24,7 @@ export default function MarketsPage() {
       const data = await marketAPI.get({
         marketStatus: activeTab,
         page,
-        limit: 10,
+        limit: 12,
       });
       formatMarketData(data.data);
       setTotalPages(data.totalPages || 1);
@@ -35,135 +35,87 @@ export default function MarketsPage() {
     }
   };
 
-  const calculatePercentage = (market: MarketDataType) => {
-    const totalA = market.playerACount || 0;
-    const totalB = market.playerBCount || 0;
-    const total = totalA + totalB;
-    if (total === 0) return 50;
-    return Math.round((totalA / total) * 100);
-  };
+  const marketPreviews = markets.map(toMarketPreview);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">Prediction Markets</h1>
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl md:text-4xl font-bold text-[#0b1f3a]">Markets</h1>
         
         {/* Tab Navigation */}
-        <div className="flex gap-2 mb-6">
-          {(["ACTIVE", "PENDING", "CLOSED", "INIT"] as const).map((tab) => (
-            <Button
+        <div className="flex gap-2">
+          {(["ACTIVE", "CLOSED"] as const).map((tab) => (
+            <button
               key={tab}
               onClick={() => {
                 setActiveTab(tab);
                 setPage(1);
               }}
-              variant={activeTab === tab ? "default" : "outline"}
+              className={`px-4 py-2 rounded-xl font-bold border-2 transition-colors ${
+                activeTab === tab
+                  ? "bg-[#0b1f3a] text-white border-black"
+                  : "bg-white text-[#0b1f3a] border-black hover:bg-neutral-100"
+              }`}
             >
               {tab}
-            </Button>
+            </button>
           ))}
         </div>
       </div>
 
       {loading ? (
-        <div className="text-center py-12">Loading markets...</div>
+        <div className="text-center py-20">
+          <div className="text-xl font-bold text-[#0b1f3a]">Loading markets...</div>
+        </div>
       ) : markets.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-lg mb-4">No markets found</p>
-          <Link href="/propose">
-            <Button>Create a Market</Button>
+        <div className="text-center py-20">
+          <h2 className="text-2xl font-bold text-[#0b1f3a] mb-4">No markets found</h2>
+          <p className="text-lg text-[#0b1f3a] opacity-70 mb-6">
+            Be the first to create a market!
+          </p>
+          <Link href="/create">
+            <Button className="px-6 py-3 rounded-xl bg-[#0b1f3a] text-white font-bold border-2 border-black hover:bg-[#174a8c]">
+              Create Market
+            </Button>
           </Link>
         </div>
       ) : (
         <>
           {/* Markets Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {markets.map((market) => {
-              const yesPercentage = calculatePercentage(market);
-              const timeLeft = getCountDown(market.date);
-
-              return (
-                <Card key={market._id} className="p-6">
-                  <div className="mb-4">
-                    {market.imageUrl && (
-                      <img
-                        src={market.imageUrl}
-                        alt={market.question}
-                        className="w-full h-48 object-cover rounded-lg mb-4"
-                      />
-                    )}
-                    <h3 className="text-xl font-semibold mb-2">{market.question}</h3>
-                    <p className="text-sm text-gray-500 mb-2">{market.description}</p>
-                  </div>
-
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between text-sm">
-                      <span>Volume:</span>
-                      <span className="font-semibold">
-                        {formatNumber(market.totalInvestment || 0)} SOL
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Time Left:</span>
-                      <span className="font-semibold">{timeLeft}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Status:</span>
-                      <span className="font-semibold">{market.marketStatus}</span>
-                    </div>
-                  </div>
-
-                  {/* Yes/No Percentage Bar */}
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-green-500">YES {yesPercentage}%</span>
-                      <span className="text-red-500">NO {100 - yesPercentage}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-green-500 h-2 rounded-full"
-                        style={{ width: `${yesPercentage}%` }}
-                      ></div>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Link href={`/markets/${market._id}`} className="flex-1">
-                      <Button variant="outline" className="w-full">
-                        View Details
-                      </Button>
-                    </Link>
-                    {market.marketStatus === "ACTIVE" && (
-                      <Link href={`/markets/${market._id}/bet`} className="flex-1">
-                        <Button className="w-full">Place Bet</Button>
-                      </Link>
-                    )}
-                  </div>
-                </Card>
-              );
-            })}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            {marketPreviews.map((market) => (
+              <MarketPreviewCard key={market.id} {...market} className="w-full" />
+            ))}
           </div>
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center gap-2">
-              <Button
+            <div className="flex justify-center gap-4 mt-4">
+              <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                variant="outline"
+                className={`px-6 py-2 rounded-xl font-bold border-2 ${
+                  page === 1
+                    ? "bg-neutral-200 text-neutral-400 border-neutral-300 cursor-not-allowed"
+                    : "bg-white text-[#0b1f3a] border-black hover:bg-neutral-100"
+                }`}
               >
                 Previous
-              </Button>
-              <span className="flex items-center px-4">
+              </button>
+              <span className="flex items-center px-4 font-bold text-[#0b1f3a]">
                 Page {page} of {totalPages}
               </span>
-              <Button
+              <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                variant="outline"
+                className={`px-6 py-2 rounded-xl font-bold border-2 ${
+                  page === totalPages
+                    ? "bg-neutral-200 text-neutral-400 border-neutral-300 cursor-not-allowed"
+                    : "bg-white text-[#0b1f3a] border-black hover:bg-neutral-100"
+                }`}
               >
                 Next
-              </Button>
+              </button>
             </div>
           )}
         </>

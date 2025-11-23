@@ -1,53 +1,92 @@
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+"use client";
+
+import { useEffect, useState } from "react";
+import HorizontalTicker from "@/components/horizontal-ticker";
+import MarketPreviewCard from "@/components/market-preview-card";
+import AboutSection from "@/components/about-section";
+import { useMarkets } from "@/hooks/use-markets";
+import { marketAPI } from "@/lib/api-client";
+import { useGlobalContext } from "@/lib/contexts/GlobalContext";
 
 export default function Home() {
+  const { formatMarketData } = useGlobalContext();
+  const { markets: activeMarkets } = useMarkets("active");
+  const { markets: closedMarkets } = useMarkets("closed");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadMarkets = async () => {
+      try {
+        const data = await marketAPI.get({
+          marketStatus: "ACTIVE",
+          page: 1,
+          limit: 20,
+        });
+        formatMarketData(data.data || []);
+      } catch (error) {
+        console.error("Failed to load markets:", error);
+        formatMarketData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadMarkets();
+  }, [formatMarketData]);
+
   return (
-    <div className="flex min-h-screen flex-col">
-      <div className="w-full py-16 bg-gradient-to-b from-gray-900 to-gray-800 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-4">
-            Decentralized Prediction Markets
-          </h1>
-          <p className="text-xl mb-8 text-gray-300">
-            Create, fund, and trade on prediction markets powered by Solana
+    <div className="flex flex-col gap-8 md:gap-10">
+      <div className="text-center py-6">
+        <h1 className="text-4xl md:text-6xl font-bold text-[#0b1f3a] mb-2">
+          Prediction Markets on Solana
+        </h1>
+        <p className="text-lg md:text-xl text-[#0b1f3a] opacity-70">
+          Trade on the future. Powered by decentralized markets.
+        </p>
+      </div>
+
+      {activeMarkets.length > 0 && (
+        <HorizontalTicker
+          title="Active Markets"
+          items={activeMarkets}
+          speedMs={40_000}
+          renderItem={(market) => (
+            <MarketPreviewCard
+              key={market.id}
+              {...market}
+              className="w-[320px] md:w-[360px] h-[320px] overflow-hidden shrink-0"
+            />
+          )}
+        />
+      )}
+
+      {closedMarkets.length > 0 && (
+        <HorizontalTicker
+          title="Closed Markets"
+          items={closedMarkets}
+          speedMs={35_000}
+          reverse
+          renderItem={(market) => (
+            <MarketPreviewCard
+              key={market.id}
+              {...market}
+              className="w-[320px] md:w-[360px] h-[320px] overflow-hidden shrink-0"
+            />
+          )}
+        />
+      )}
+
+      {activeMarkets.length === 0 && closedMarkets.length === 0 && (
+        <div className="text-center py-20">
+          <h2 className="text-2xl font-bold text-[#0b1f3a] mb-4">
+            No markets available yet
+          </h2>
+          <p className="text-lg text-[#0b1f3a] opacity-70">
+            Be the first to create a market!
           </p>
-          <div className="flex gap-4 justify-center">
-            <Link href="/markets">
-              <Button size="lg" className="text-lg">
-                Explore Markets
-              </Button>
-            </Link>
-            <Link href="/propose">
-              <Button size="lg" variant="outline" className="text-lg">
-                Create Market
-              </Button>
-            </Link>
-          </div>
         </div>
-      </div>
-      <div className="mx-auto flex max-w-6xl flex-1 flex-col px-6 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 bg-card rounded-lg shadow border">
-            <h3 className="text-xl font-bold mb-2">🎯 Create Markets</h3>
-            <p className="text-muted-foreground">
-              Propose prediction markets on any future event and earn fees
-            </p>
-          </div>
-          <div className="p-6 bg-card rounded-lg shadow border">
-            <h3 className="text-xl font-bold mb-2">💰 Provide Liquidity</h3>
-            <p className="text-muted-foreground">
-              Fund markets and earn a share of all trading fees
-            </p>
-          </div>
-          <div className="p-6 bg-card rounded-lg shadow border">
-            <h3 className="text-xl font-bold mb-2">📈 Trade & Win</h3>
-            <p className="text-muted-foreground">
-              Bet on outcomes and win from the prediction pool
-            </p>
-          </div>
-        </div>
-      </div>
+      )}
+
+      <AboutSection />
     </div>
-  )
+  );
 }

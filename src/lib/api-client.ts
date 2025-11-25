@@ -33,6 +33,11 @@ export const marketAPI = {
     const response = await axios.get(`${API_BASE_URL}/market/get`, { params });
     return response.data;
   },
+
+  getById: async (id: string) => {
+    const response = await axios.get(`${API_BASE_URL}/market/${id}`);
+    return response.data;
+  },
 };
 
 // Oracle API

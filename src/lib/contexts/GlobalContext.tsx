@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useCallback } from "react";
 
 export type MarketStatus = "INIT" | "PENDING" | "ACTIVE" | "CLOSED";
 
@@ -49,9 +49,9 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [activeTab, setActiveTab] = useState<MarketStatus>("ACTIVE");
   const [markets, setMarkets] = useState<MarketDataType[]>([]);
 
-  const formatMarketData = (data: MarketDataType[]) => {
+  const formatMarketData = useCallback((data: MarketDataType[]) => {
     setMarkets(data);
-  };
+  }, []);
 
   return (
     <GlobalContext.Provider

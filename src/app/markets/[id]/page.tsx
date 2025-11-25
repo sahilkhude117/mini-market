@@ -1,233 +1,217 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams } from "next/navigation";
-import { useMarket } from "@/hooks/use-markets";
-import Sparkline from "@/components/sparkline";
-import { calculateMarketStats } from "@/lib/data-adapters";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import RootLayoutClient from "@/components/root-layout-client";
+import Sparkline from "@/components/sparkline-new";
+import { marketAPI } from "@/lib/api-client";
 
-export default function MarketDetailPage() {
+function CalendarIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      <rect x="3" y="6" width="18" height="15" rx="2" stroke="currentColor" strokeWidth="2" />
+      <path d="M3 10h18" stroke="currentColor" strokeWidth="2" />
+      <path d="M8 3v4M16 3v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export default function MarketDetailsPage() {
   const params = useParams();
-  const marketId = params?.id as string;
-  const { market, rawMarket, loading } = useMarket(marketId);
-  const [betAmount, setBetAmount] = useState("");
-  const [placingBet, setPlacingBet] = useState(false);
+  const id = params?.id as string;
+  const [market, setMarket] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [amount, setAmount] = useState<string>("");
+  const [isSubmittingYes, setIsSubmittingYes] = useState(false);
+  const [isSubmittingNo, setIsSubmittingNo] = useState(false);
 
-  if (loading) {
-    return (
-      <div className="text-center py-20">
-        <div className="text-xl font-bold text-[#0b1f3a]">Loading market...</div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (id) {
+      loadMarket();
+    }
+  }, [id]);
 
-  if (!market || !rawMarket) {
-    return (
-      <div className="text-center py-20">
-        <h2 className="text-2xl font-bold text-[#0b1f3a] mb-4">Market not found</h2>
-        <Link href="/markets">
-          <button className="px-6 py-3 rounded-xl bg-[#0b1f3a] text-white font-bold border-2 border-black hover:bg-[#174a8c]">
-            Back to Markets
-          </button>
-        </Link>
-      </div>
-    );
-  }
-
-  const stats = calculateMarketStats(rawMarket);
-
-  const handlePlaceBet = async (isYes: boolean) => {
-    if (!betAmount || parseFloat(betAmount) <= 0) return;
-    
-    setPlacingBet(true);
+  const loadMarket = async () => {
     try {
-      // TODO: Implement actual bet placement logic
-      console.log(`Placing ${betAmount} SOL bet on ${isYes ? "YES" : "NO"}`);
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate transaction
-      alert(`Bet placed successfully!`);
-      setBetAmount("");
+      setLoading(true);
+      const data = await marketAPI.getById(id);
+      setMarket(data);
     } catch (error) {
-      console.error("Failed to place bet:", error);
-      alert("Failed to place bet");
+      console.error("Failed to load market:", error);
     } finally {
-      setPlacingBet(false);
+      setLoading(false);
     }
   };
 
-  return (
-    <div className="flex flex-col gap-6">
-      {/* Back Button */}
-      <Link href="/markets" className="inline-flex items-center gap-2 text-[#0b1f3a] hover:opacity-70 w-fit">
-        <ArrowLeft className="w-5 h-5" />
-        <span className="font-bold">Back to Markets</span>
-      </Link>
+  if (loading || !market) {
+    return (
+      <RootLayoutClient>
+        <div className="max-w-3xl">
+          <div className="text-[#0b1f3a] font-bold">Loading market…</div>
+        </div>
+      </RootLayoutClient>
+    );
+  }
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Market Info */}
-        <div className="lg:col-span-2 flex flex-col gap-6">
-          {/* Market Header */}
-          <div className="p-[3px] rounded-2xl bg-gradient-to-r from-[#0b1f3a] via-[#174a8c] to-[#6b5b95]">
-            <div className="bg-white rounded-[calc(1rem-3px)] border-4 border-black p-6">
-              <div className="flex items-start gap-4 mb-4">
-                {market.logoUrl && (
-                  <img
-                    src={market.logoUrl}
-                    alt="Market logo"
-                    className="w-16 h-16 object-contain"
-                  />
-                )}
-                <div className="flex-1">
-                  <h1 className="text-2xl md:text-3xl font-extrabold text-[#0b1f3a] mb-2">
-                    {market.title}
-                  </h1>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="inline-flex items-center gap-1 border-2 border-black bg-white rounded-full px-3 py-1 text-sm font-bold text-[#0b1f3a]">
-                      Status: {market.status}
-                    </span>
-                    <span className="inline-flex items-center gap-1 border-2 border-black bg-white rounded-full px-3 py-1 text-sm font-bold text-[#0b1f3a]">
-                      {new Date(market.resolutionDate).toLocaleDateString()}
-                    </span>
+  const estimatedEndMs = market.resultsEndMs || market.opportunityEndMs || (market.endTime ? new Date(market.endTime).getTime() : Date.now() + 86400000);
+  const estimatedDate = new Date(estimatedEndMs).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+
+  const priceSeries = market.priceSeries || [50, 52, 48, 55, 54, 60, 58, 62];
+  const currentProbability = priceSeries.length > 0 ? priceSeries[priceSeries.length - 1] : 50;
+  const currentPriceUsd = currentProbability / 100;
+
+  const chartTimestamps = useMemo(() => {
+    const len = priceSeries.length;
+    if (len === 0) return [] as number[];
+    const end = Date.now();
+    const start = end - (len - 1) * 3600_000;
+    return Array.from({ length: len }, (_, i) => start + i * 3600_000);
+  }, [priceSeries]);
+
+  function handleBuy(side: "YES" | "NO") {
+    const solAmount = parseFloat(amount);
+    if (!isFinite(solAmount) || solAmount <= 0) return;
+    if (side === "YES") setIsSubmittingYes(true);
+    if (side === "NO") setIsSubmittingNo(true);
+
+    // Mock buy - integrate with actual smart contract
+    setTimeout(() => {
+      console.log(`Buying ${side} with ${solAmount} SOL`);
+      if (side === "YES") setIsSubmittingYes(false);
+      if (side === "NO") setIsSubmittingNo(false);
+      setAmount("");
+    }, 2000);
+  }
+
+  return (
+    <RootLayoutClient>
+      <div className="w-full">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_420px] gap-8 items-start">
+          <div className="space-y-8">
+            <header className="flex gap-4 items-start">
+              {market.logoUrl || market.image ? (
+                <img
+                  src={market.logoUrl || market.image}
+                  alt="Market logo"
+                  className="w-12 h-12 md:w-16 md:h-16 object-contain"
+                />
+              ) : null}
+              <div className="min-w-0 flex-1">
+                <h2 className="text-2xl md:text-3xl font-extrabold text-[#0b1f3a]">
+                  {market.title || market.question || "Untitled Market"}
+                </h2>
+                <div className="mt-2 flex items-center gap-2 text-xs md:text-sm text-[#0b1f3a] opacity-70">
+                  <CalendarIcon className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="font-bold">{estimatedDate}</span>
+                </div>
+                <div className="mt-3">
+                  <div className="text-xs uppercase tracking-wide text-[#0b1f3a] opacity-60">
+                    Predicted
+                  </div>
+                  <div className="text-3xl md:text-5xl font-extrabold text-[#0b1f3a] tabular-nums">
+                    {currentProbability.toFixed(1)}%
                   </div>
                 </div>
               </div>
+            </header>
 
-              <p className="text-[#0b1f3a] mb-4">{market.description}</p>
-
-              {/* Market Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t-2 border-black">
-                <div>
-                  <div className="text-xs uppercase tracking-wide text-[#0b1f3a] opacity-60">YES Probability</div>
-                  <div className="text-2xl font-extrabold text-[#0b1f3a]">{stats.yesProbability.toFixed(1)}%</div>
+            <section>
+              <Sparkline
+                values={priceSeries}
+                height={320}
+                stroke="#000"
+                className="block w-full"
+                showAxes
+                showTooltip
+                showCurrentRefLine
+                yStartAtZero
+                timestamps={chartTimestamps}
+              />
+              <div className="mt-4 border-4 border-black rounded-2xl p-4 bg-white">
+                <div className="text-sm font-extrabold text-[#0b1f3a] uppercase tracking-wide">
+                  Resolution criteria
                 </div>
-                <div>
-                  <div className="text-xs uppercase tracking-wide text-[#0b1f3a] opacity-60">NO Probability</div>
-                  <div className="text-2xl font-extrabold text-[#0b1f3a]">{stats.noProbability.toFixed(1)}%</div>
-                </div>
-                <div>
-                  <div className="text-xs uppercase tracking-wide text-[#0b1f3a] opacity-60">Total Volume</div>
-                  <div className="text-2xl font-extrabold text-[#0b1f3a]">{stats.totalVolume.toFixed(2)}</div>
-                </div>
-                <div>
-                  <div className="text-xs uppercase tracking-wide text-[#0b1f3a] opacity-60">Liquidity</div>
-                  <div className="text-2xl font-extrabold text-[#0b1f3a]">{stats.liquidity.toFixed(2)}</div>
-                </div>
+                <p className="mt-2 text-sm md:text-base text-[#0b1f3a] opacity-80">
+                  {market.resolutionCriteria || market.description || "To be determined"}
+                </p>
               </div>
-            </div>
+            </section>
+
+            {market.description && (
+              <section>
+                <h4 className="text-lg md:text-xl font-extrabold text-[#0b1f3a]">
+                  Details
+                </h4>
+                <p className="mt-2 text-sm md:text-base text-[#0b1f3a]">
+                  {market.description}
+                </p>
+              </section>
+            )}
           </div>
 
-          {/* Price Chart */}
-          {market.priceSeries && market.priceSeries.length > 0 && (
-            <div className="p-[3px] rounded-2xl bg-gradient-to-r from-[#0b1f3a] via-[#174a8c] to-[#6b5b95]">
-              <div className="bg-white rounded-[calc(1rem-3px)] border-4 border-black p-6">
-                <h2 className="text-xl font-extrabold text-[#0b1f3a] mb-4">Price History</h2>
-                <Sparkline
-                  values={market.priceSeries}
-                  height={200}
-                  className="w-full"
-                  showAxes
-                  showTooltip
-                  showCurrentRefLine
-                  yStartAtZero
+          {/* Trade Panel */}
+          <aside className="sticky top-24">
+            <div className="border-4 border-black rounded-2xl bg-white p-4 md:p-6 shadow-lg">
+              <h3 className="text-xl md:text-2xl font-extrabold text-[#0b1f3a] mb-4">
+                Place your bet
+              </h3>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-[#0b1f3a] mb-2">
+                  Amount (SOL)
+                </label>
+                <input
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="0.00"
+                  className="w-full px-4 py-3 border-2 border-black rounded-xl text-lg font-bold focus:outline-none focus:ring-2 focus:ring-[#174a8c]"
+                  step="0.1"
+                  min="0"
                 />
               </div>
-            </div>
-          )}
 
-          {/* Market Details */}
-          <div className="p-[3px] rounded-2xl bg-gradient-to-r from-[#0b1f3a] via-[#174a8c] to-[#6b5b95]">
-            <div className="bg-white rounded-[calc(1rem-3px)] border-4 border-black p-6">
-              <h2 className="text-xl font-extrabold text-[#0b1f3a] mb-4">Market Information</h2>
-              <div className="space-y-3 text-[#0b1f3a]">
-                <div>
-                  <div className="text-sm font-bold opacity-70">Creator</div>
-                  <div className="font-mono text-sm">{rawMarket.creator}</div>
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <button
+                  type="button"
+                  onClick={() => handleBuy("YES")}
+                  disabled={isSubmittingYes || !amount}
+                  className="px-4 py-3 rounded-xl bg-green-600 text-white font-extrabold border-2 border-black hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmittingYes ? "Buying..." : `YES ${currentProbability.toFixed(0)}%`}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleBuy("NO")}
+                  disabled={isSubmittingNo || !amount}
+                  className="px-4 py-3 rounded-xl bg-red-600 text-white font-extrabold border-2 border-black hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmittingNo ? "Buying..." : `NO ${(100 - currentProbability).toFixed(0)}%`}
+                </button>
+              </div>
+
+              <div className="text-xs text-[#0b1f3a] opacity-70 space-y-1">
+                <div className="flex justify-between">
+                  <span>Current price:</span>
+                  <span className="font-bold">${currentPriceUsd.toFixed(2)}</span>
                 </div>
-                <div>
-                  <div className="text-sm font-bold opacity-70">Feed Name</div>
-                  <div>{rawMarket.feedName}</div>
-                </div>
-                <div>
-                  <div className="text-sm font-bold opacity-70">Target Value</div>
-                  <div>{rawMarket.value} (±{rawMarket.range})</div>
-                </div>
-                <div>
-                  <div className="text-sm font-bold opacity-70">Resolution Date</div>
-                  <div>{new Date(rawMarket.date).toLocaleString()}</div>
-                </div>
+                {amount && parseFloat(amount) > 0 && (
+                  <div className="flex justify-between">
+                    <span>Potential shares:</span>
+                    <span className="font-bold">
+                      {(parseFloat(amount) * 185 / currentPriceUsd).toFixed(2)}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Right Column: Trading Panel */}
-        <div className="lg:col-span-1 flex flex-col gap-6">
-          {/* Trade Panel */}
-          <div className="p-[3px] rounded-2xl bg-gradient-to-r from-[#0b1f3a] via-[#174a8c] to-[#6b5b95] sticky top-24">
-            <div className="bg-white rounded-[calc(1rem-3px)] border-4 border-black p-6">
-              <h2 className="text-xl font-extrabold text-[#0b1f3a] mb-4">Place Your Bet</h2>
-              
-              {market.status === "active" ? (
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="amount" className="text-sm font-bold text-[#0b1f3a]">
-                      Amount (SOL)
-                    </Label>
-                    <Input
-                      id="amount"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={betAmount}
-                      onChange={(e) => setBetAmount(e.target.value)}
-                      placeholder="0.00"
-                      className="mt-2 border-2 border-black rounded-lg"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => handlePlaceBet(true)}
-                      disabled={placingBet || !betAmount || parseFloat(betAmount) <= 0}
-                      className={`w-full px-4 py-4 rounded-xl font-bold border-2 border-black transition-colors ${
-                        placingBet || !betAmount || parseFloat(betAmount) <= 0
-                          ? "bg-neutral-200 text-neutral-400 cursor-not-allowed"
-                          : "bg-green-500 text-white hover:bg-green-600"
-                      }`}
-                    >
-                      Buy YES ({stats.yesProbability.toFixed(1)}%)
-                    </button>
-                    <button
-                      onClick={() => handlePlaceBet(false)}
-                      disabled={placingBet || !betAmount || parseFloat(betAmount) <= 0}
-                      className={`w-full px-4 py-4 rounded-xl font-bold border-2 border-black transition-colors ${
-                        placingBet || !betAmount || parseFloat(betAmount) <= 0
-                          ? "bg-neutral-200 text-neutral-400 cursor-not-allowed"
-                          : "bg-red-500 text-white hover:bg-red-600"
-                      }`}
-                    >
-                      Buy NO ({stats.noProbability.toFixed(1)}%)
-                    </button>
-                  </div>
-
-                  {placingBet && (
-                    <div className="text-center text-sm text-[#0b1f3a] opacity-70">
-                      Processing transaction...
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="text-center py-8 text-[#0b1f3a] opacity-70">
-                  This market is {market.status}
-                </div>
-              )}
-            </div>
-          </div>
+          </aside>
         </div>
       </div>
-    </div>
+    </RootLayoutClient>
   );
 }

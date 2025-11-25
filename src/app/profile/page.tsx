@@ -1,158 +1,155 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useWalletUi } from "@wallet-ui/react";
-import { profileAPI } from "@/lib/api-client";
-import PositionCard from "@/components/position-card";
-import Link from "next/link";
-import { Copy } from "lucide-react";
+import RootLayoutClient from "@/components/root-layout-client";
+import { useUserAddress } from "@/hooks/use-user-address";
+import MarketPreviewCard from "@/components/market-preview-card-new";
+import { useMarkets } from "@/hooks/use-markets";
+import { marketAPI } from "@/lib/api-client";
+import { useGlobalContext } from "@/lib/contexts/GlobalContext";
 
 export default function ProfilePage() {
-  const { account } = useWalletUi();
-  const publicKey = account?.address;
-  const [profile, setProfile] = useState<any>(null);
+  const { short, address } = useUserAddress();
+  const { formatMarketData, markets } = useGlobalContext();
+  const { markets: activeMarkets } = useMarkets("active");
+  const { markets: closedMarkets } = useMarkets("closed");
   const [loading, setLoading] = useState(true);
-  const [copiedAddress, setCopiedAddress] = useState(false);
+
+  const balanceUsd = 1000; // Mock balance
+  const pnlUsd = 150; // Mock PnL
 
   useEffect(() => {
-    if (publicKey) {
-      loadProfile();
-    }
-  }, [publicKey]);
-
-  const loadProfile = async () => {
-    if (!publicKey) return;
-
-    try {
-      setLoading(true);
-      const data = await profileAPI.get(publicKey.toString());
-      setProfile(data);
-    } catch (error) {
-      console.error("Failed to load profile:", error);
-    } finally {
+    // Only load markets if not already loaded
+    if (markets.length > 0) {
       setLoading(false);
+      return;
     }
-  };
 
-  const copyAddress = () => {
-    if (publicKey) {
-      navigator.clipboard.writeText(publicKey.toString());
-      setCopiedAddress(true);
-      setTimeout(() => setCopiedAddress(false), 2000);
-    }
-  };
+    const loadMarkets = async () => {
+      try {
+        const data = await marketAPI.get({
+          marketStatus: "ACTIVE",
+          page: 1,
+          limit: 50,
+        });
+        formatMarketData(data.data || []);
+      } catch (error) {
+        console.error("Failed to load markets:", error);
+        formatMarketData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadMarkets();
+  }, [formatMarketData, markets.length]);
 
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 4)}...${address.slice(-4)}`;
-  };
+  const now = Date.now();
+  
+  // Filter for current markets (public only, active)
+  const currentMarkets = activeMarkets.filter((m: any) => {
+    const oppEndMs = m.opportunityEndMs || (m.endTime ? new Date(m.endTime).getTime() : Date.now() + 86400000);
+    const resultsEndMs = m.resultsEndMs || oppEndMs;
+    return now >= oppEndMs && (resultsEndMs == null || now < resultsEndMs);
+  });
 
-  // Convert betting history to positions
-  const positions = profile?.bettingHistory?.map((market: any, index: number) => ({
-    id: `${market._id}-${index}`,
-    marketId: market._id,
-    marketTitle: market.question,
-    marketLogoUrl: market.imageUrl,
-    side: market.isYes ? "YES" : "NO",
-    shares: market.amount || 0,
-    investedAmount: market.amount || 0,
-    currentValue: market.marketStatus === "ACTIVE" ? market.amount * 1.1 : undefined,
-    pnl: market.marketStatus === "ACTIVE" ? market.amount * 0.1 : undefined,
-    status: market.marketStatus === "ACTIVE" ? "active" : "closed",
-    resolvedOutcome: market.marketStatus === "CLOSED" ? (Math.random() > 0.5 ? "YES" : "NO") : undefined,
-  })) || [];
-
-  if (!publicKey) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <div className="p-[3px] rounded-2xl bg-gradient-to-r from-[#0b1f3a] via-[#174a8c] to-[#6b5b95] max-w-md w-full">
-          <div className="bg-white rounded-[calc(1rem-3px)] border-4 border-black p-8 text-center">
-            <h2 className="text-2xl font-bold text-[#0b1f3a] mb-4">Connect Your Wallet</h2>
-            <p className="text-[#0b1f3a] opacity-70">Please connect your wallet to view your profile</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="text-center py-20">
-        <div className="text-xl font-bold text-[#0b1f3a]">Loading profile...</div>
-      </div>
-    );
-  }
-
-  const portfolioValue = (profile?.earnedBet || 0) + (profile?.totalLiquidityProvided || 0);
+  // Ended markets
+  const endedMarkets = closedMarkets;
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-3xl md:text-4xl font-bold text-[#0b1f3a]">My Profile</h1>
-
-      {/* Top Row: Address and Portfolio Value */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Address Card */}
-        <div className="p-[3px] rounded-2xl bg-gradient-to-r from-[#0b1f3a] via-[#174a8c] to-[#6b5b95]">
-          <div className="bg-white rounded-[calc(1rem-3px)] border-4 border-black p-5">
-            <div className="text-xs uppercase tracking-wide text-[#0b1f3a] opacity-60 mb-2">Wallet Address</div>
-            <div className="flex items-center justify-between">
-              <div className="font-mono text-lg font-bold text-[#0b1f3a]">
-                {formatAddress(publicKey.toString())}
-              </div>
-              <button
-                onClick={copyAddress}
-                className="p-2 rounded-lg border-2 border-black bg-white hover:bg-neutral-100 transition-colors"
-                title="Copy address"
-              >
-                <Copy className="w-5 h-5 text-[#0b1f3a]" />
-              </button>
-            </div>
-            {copiedAddress && (
-              <div className="mt-2 text-sm text-green-600 font-semibold">Copied!</div>
-            )}
+    <RootLayoutClient>
+      <div className="max-w-4xl w-full mx-auto">
+        {/* Top metrics: left box (address + portfolio value), right box (cumulative PnL) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="border-4 border-black rounded-2xl bg-white p-4 flex flex-col gap-2">
+            <div className="text-xs uppercase tracking-wide text-[#0b1f3a] opacity-60">Address</div>
+            <div className="text-base md:text-lg font-extrabold text-[#0b1f3a] font-mono">{short}</div>
+            <div className="text-xs uppercase tracking-wide text-[#0b1f3a] opacity-60 mt-2">Portfolio Value</div>
+            <div className="text-3xl md:text-4xl font-extrabold text-[#0b1f3a]">{fmtUsd(balanceUsd)}</div>
           </div>
-        </div>
-
-        {/* Portfolio Value Card */}
-        <div className="p-[3px] rounded-2xl bg-gradient-to-r from-[#0b1f3a] via-[#174a8c] to-[#6b5b95]">
-          <div className="bg-white rounded-[calc(1rem-3px)] border-4 border-black p-5">
-            <div className="text-xs uppercase tracking-wide text-[#0b1f3a] opacity-60 mb-2">Portfolio Value</div>
-            <div className="text-3xl font-extrabold text-[#0b1f3a]">{portfolioValue.toFixed(4)} SOL</div>
-            <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
-              <div>
-                <div className="text-xs opacity-60">Markets</div>
-                <div className="font-bold">{profile?.activeBet || 0}</div>
-              </div>
-              <div>
-                <div className="text-xs opacity-60">Total Bets</div>
-                <div className="font-bold">{profile?.totalBet || 0}</div>
+          <div className="border-4 border-black rounded-2xl bg-white p-4 flex flex-col justify-between">
+            <div>
+              <div className="text-xs uppercase tracking-wide text-[#0b1f3a] opacity-60">Cumulative PnL</div>
+              <div className={`text-3xl md:text-4xl font-extrabold ${pnlUsd >= 0 ? "text-green-700" : "text-red-700"}`}>
+                {fmtSignedUsd(pnlUsd)}
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Positions Section */}
-      <div>
-        <h2 className="text-2xl font-bold text-[#0b1f3a] mb-4">Your Positions</h2>
-        {positions.length > 0 ? (
-          <div className="flex flex-col gap-4">
-            {positions.map((position: any) => (
-              <PositionCard key={position.id} position={position} />
-            ))}
+        {/* Current Markets */}
+        <section className="mb-8">
+          <div className="mb-3 md:mb-4">
+            <h2 className="text-xl md:text-2xl font-extrabold text-[#0b1f3a]">Your Current Markets</h2>
           </div>
-        ) : (
-          <div className="p-[3px] rounded-2xl bg-gradient-to-r from-[#0b1f3a] via-[#174a8c] to-[#6b5b95]">
-            <div className="bg-white rounded-[calc(1rem-3px)] border-4 border-black p-8 text-center">
-              <p className="text-[#0b1f3a] opacity-70 mb-4">No positions yet</p>
-              <Link href="/markets">
-                <button className="px-6 py-3 rounded-xl bg-[#0b1f3a] text-white font-bold border-2 border-black hover:bg-[#174a8c] transition-colors">
-                  Browse Markets
-                </button>
-              </Link>
-            </div>
+          <div className="grid grid-cols-1 gap-4">
+            {currentMarkets.map((m: any) => {
+              const opportunityStartMs = (m.opportunityEndMs || Date.now()) - 24 * 3600_000;
+              return (
+                <MarketPreviewCard
+                  key={m.id}
+                  id={m.id}
+                  logoUrl={m.logoUrl || m.image || ""}
+                  title={m.title || m.question || "Untitled Market"}
+                  description={m.description || ""}
+                  opportunityStartMs={opportunityStartMs}
+                  opportunityEndMs={m.opportunityEndMs || (m.endTime ? new Date(m.endTime).getTime() : Date.now() + 86400000)}
+                  resultsEndMs={m.resultsEndMs}
+                  nextOpportunityStartMs={m.nextOpportunityStartMs}
+                  isPriceHidden={false}
+                  attentionScore={m.attentionScore}
+                  priceSeries={m.priceSeries || [50, 52, 48, 55, 54, 60, 58]}
+                  className="w-full"
+                />
+              );
+            })}
           </div>
-        )}
+          {currentMarkets.length === 0 && !loading && (
+            <p className="text-[#0b1f3a] opacity-70">No current markets</p>
+          )}
+        </section>
+
+        {/* Ended Markets */}
+        <section>
+          <div className="mb-3 md:mb-4">
+            <h2 className="text-xl md:text-2xl font-extrabold text-[#0b1f3a]">Ended Markets</h2>
+          </div>
+          <div className="grid grid-cols-1 gap-4">
+            {endedMarkets.map((m: any) => {
+              const opportunityStartMs = (m.opportunityEndMs || Date.now()) - 24 * 3600_000;
+              return (
+                <MarketPreviewCard
+                  key={m.id}
+                  id={m.id}
+                  logoUrl={m.logoUrl || m.image || ""}
+                  title={m.title || m.question || "Untitled Market"}
+                  description={m.description || ""}
+                  opportunityStartMs={opportunityStartMs}
+                  opportunityEndMs={m.opportunityEndMs || (m.endTime ? new Date(m.endTime).getTime() : Date.now() + 86400000)}
+                  resultsEndMs={m.resultsEndMs}
+                  nextOpportunityStartMs={m.nextOpportunityStartMs}
+                  isPriceHidden={false}
+                  attentionScore={m.attentionScore}
+                  priceSeries={m.priceSeries || [50, 52, 48, 55, 54, 60, 58]}
+                  className="w-full"
+                />
+              );
+            })}
+          </div>
+          {endedMarkets.length === 0 && !loading && (
+            <p className="text-[#0b1f3a] opacity-70">No ended markets</p>
+          )}
+        </section>
       </div>
-    </div>
+    </RootLayoutClient>
   );
+}
+
+function fmtUsd(n: number): string {
+  return `$${n.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+}
+
+function fmtSignedUsd(n: number): string {
+  const sign = n >= 0 ? "" : "-";
+  const v = Math.abs(n);
+  return `${sign}$${v.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
 }

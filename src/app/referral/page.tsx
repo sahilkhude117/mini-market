@@ -1,211 +1,145 @@
 "use client";
 
+import ReferralItem from "@/components/elements/referral/ReferralItem";
+import { LuCopy } from "react-icons/lu";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useWalletUi } from "@wallet-ui/react";
-import { referralAPI } from "@/lib/api-client";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
+import { FaUserFriends, FaCoins } from "react-icons/fa";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useSearchParams } from "next/navigation";
+import { url } from "@/data/data";
+import { errorAlert } from "@/components/elements/ToastGroup";
+import { ReferralType } from "@/types/type";
 
-export default function ReferralPage() {
-  const { account } = useWalletUi();
-  const publicKey = account?.address;
-  const [referralCode, setReferralCode] = useState("");
-  const [referrals, setReferrals] = useState<any[]>([]);
-  const [inputReferralCode, setInputReferralCode] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [claimLoading, setClaimLoading] = useState(false);
-  const [totalFees, setTotalFees] = useState(0);
+const referrals = [
+  {
+    referralCode: "asdjncinj6543Dhj5C49iumxcmvbnxc97",
+    timeAgo: "2m ago",
+    amount: "0.08",
+    status: "active" as const,
+    user: "referral"
+  },
+  {
+    referralCode: "98bhvDjk34Nmcx49UJHJdsfncA9076",
+    timeAgo: "5m ago",
+    amount: "0.12",
+    status: "active" as const,
+    user: "referral"
+  },
+];
+
+export default function Referral() {
+  const [copied, setCopied] = useState(false);
+  const [referralCode, setReferral] = useState("");
+  const [updating, setUpdating] = useState(true);
+  const [referral, setReferrals] = useState<ReferralType[] | null>([]);
+  const { publicKey } = useWallet();
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(referralCode);
+    setCopied(true);
+    toast.success("Referral link copied to clipboard!");
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   useEffect(() => {
-    if (publicKey) {
-      loadReferralData();
+    setUpdating(true);
+
+    const ref = new URLSearchParams(window.location.search).get("ref");
+    if (!publicKey) {
+      errorAlert("Please connect wallet!");
+      return
     }
-  }, [publicKey]);
-
-  const loadReferralData = async () => {
-    if (!publicKey) return;
-
-    try {
-      setLoading(true);
-      const data = await referralAPI.get({
-        wallet: publicKey.toString(),
-        referralCode: "",
+    (async() =>{
+      const res = await axios.post(url + "api/referral/", {
+        wallet: publicKey.toBase58(),
+        referralCode: ref? ref : ""
       });
-      setReferralCode(data.code);
-      setReferrals(data.referrals || []);
+      setReferral(`http://localhost:3000/referral?ref=${res.data.code}`);
+      console.log("res.data.code.referrals", res.data.referrals);
       
-      // Calculate total fees
-      const total = data.referrals?.reduce((sum: number, ref: any) => sum + (ref.fee || 0), 0) || 0;
-      setTotalFees(total);
-    } catch (error) {
-      console.error("Failed to load referral data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+      setReferrals(res.data.referrals);
+      setUpdating(false);
+    })();
+  }, [publicKey]); 
 
-  const handleUseReferralCode = async () => {
-    if (!publicKey || !inputReferralCode) return;
-
-    try {
-      setLoading(true);
-      const data = await referralAPI.get({
-        wallet: publicKey.toString(),
-        referralCode: inputReferralCode,
-      });
-      toast.success("Referral code applied successfully!");
-      setReferralCode(data.code);
-      setInputReferralCode("");
-    } catch (error: any) {
-      console.error("Failed to apply referral code:", error);
-      toast.error(error.response?.data?.error || "Invalid referral code");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleClaimRewards = async () => {
-    if (!publicKey || totalFees === 0) return;
-
-    try {
-      setClaimLoading(true);
-      await referralAPI.claim({
-        wallet: publicKey.toString(),
-        amount: totalFees,
-      });
-      toast.success("Rewards claimed successfully!");
-      await loadReferralData();
-    } catch (error) {
-      console.error("Failed to claim rewards:", error);
-      toast.error("Failed to claim rewards");
-    } finally {
-      setClaimLoading(false);
-    }
-  };
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(referralCode);
-    toast.success("Referral code copied to clipboard!");
-  };
-
-  if (!publicKey) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <Card className="p-12 text-center">
-          <h2 className="text-2xl font-bold mb-4">Connect Your Wallet</h2>
-          <p className="mb-6">Please connect your wallet to access referrals</p>
-        </Card>
-      </div>
-    );
-  }
+  // const totalEarnings = referrals.reduce((sum, ref) => sum + parseFloat(ref.amount), 0);
+  const activeReferrals = referral?.filter(ref => ref.status === "ACTIVE").length;
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="text-4xl font-bold mb-8">Referral Program</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-2">Total Referrals</h3>
-          <p className="text-3xl font-bold">{referrals.length}</p>
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-2">Total Fees Earned</h3>
-          <p className="text-3xl font-bold">{totalFees.toFixed(4)} SOL</p>
-          {totalFees > 0 && (
-            <Button
-              onClick={handleClaimRewards}
-              disabled={claimLoading}
-              className="mt-4 w-full"
-            >
-              {claimLoading ? "Claiming..." : "Claim Rewards"}
-            </Button>
-          )}
-        </Card>
+    <div className="w-full max-w-[1200px] mx-auto px-6 py-12 flex flex-col gap-8">
+      {/* Stats Section */}
+      <div className="grid grid-cols-2 gap-6">
+        <motion.div 
+          whileHover={{ scale: 1.02 }}
+          className="p-6 bg-gradient-to-r from-[#1e1e1e] to-[#282828] rounded-xl border border-[#313131]"
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <FaUserFriends className="text-[#00b4d8] text-xl" />
+            <h3 className="text-white text-lg font-medium">Active Referrals</h3>
+          </div>
+          <p className="text-[#00b4d8] text-2xl font-bold">{referral?.length}</p>
+        </motion.div>
+        <motion.div 
+          whileHover={{ scale: 1.02 }}
+          className="p-6 bg-gradient-to-r from-[#1e1e1e] to-[#282828] rounded-xl border border-[#313131]"
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <FaCoins className="text-[#00b4d8] text-xl" />
+            <h3 className="text-white text-lg font-medium">Total Earnings</h3>
+          </div>
+          <div className="flex items-center gap-2">
+            <p className="text-[#00b4d8] text-2xl font-bold"></p>
+            <span className="text-[#00b4d8] text-2xl font-bold">{referral?.reduce((sum, i) => sum + i.fee, 0)} SOL</span>
+          </div>
+        </motion.div>
       </div>
 
-      {/* Your Referral Code */}
-      <Card className="p-6 mb-6">
-        <h2 className="text-2xl font-bold mb-4">Your Referral Code</h2>
-        <div className="flex gap-2">
-          <Input value={referralCode} readOnly className="flex-1" />
-          <Button onClick={copyToClipboard}>Copy</Button>
-        </div>
-        <p className="text-sm text-gray-500 mt-2">
-          Share this code with friends and earn rewards when they use the platform!
-        </p>
-      </Card>
-
-      {/* Use Referral Code */}
-      {!referralCode && (
-        <Card className="p-6 mb-6">
-          <h2 className="text-2xl font-bold mb-4">Use a Referral Code</h2>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="referral">Enter Referral Code</Label>
-              <Input
-                id="referral"
-                value={inputReferralCode}
-                onChange={(e) => setInputReferralCode(e.target.value)}
-                placeholder="Enter code..."
-              />
+      {/* Referral Link Section */}
+      <div className="flex flex-col gap-3">
+        <h2 className="text-white text-2xl font-medium font-rubik">
+          Your Personal Referral Link
+        </h2>
+        <div className="h-[60px] p-2 bg-[#1e1e1e] rounded-xl border border-[#313131] flex items-center gap-3">
+          <div className="flex-1 px-6 py-3 rounded-lg">
+            <div className="text-[#838587] text-xl font-medium font-satothi">
+              {updating?"Updating..." : referralCode}
             </div>
-            <Button
-              onClick={handleUseReferralCode}
-              disabled={loading || !inputReferralCode}
-              className="w-full"
-            >
-              {loading ? "Applying..." : "Apply Code"}
-            </Button>
           </div>
-        </Card>
-      )}
-
-      {/* Referrals List */}
-      <Card className="p-6">
-        <h2 className="text-2xl font-bold mb-4">Your Referrals</h2>
-        {referrals.length > 0 ? (
-          <div className="space-y-3">
-            {referrals.map((referral: any, index: number) => (
-              <div key={index} className="p-4 border rounded-lg flex justify-between items-center">
-                <div>
-                  <p className="font-mono text-sm">{referral.wallet}</p>
-                  <p className="text-sm text-gray-500">
-                    Fees: {referral.fee?.toFixed(4) || 0} SOL
-                  </p>
-                </div>
-                <div className="text-sm text-gray-500">
-                  Level: {referral.referredLevel || 0}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-500">No referrals yet. Start sharing your code!</p>
-        )}
-      </Card>
-
-      {/* How it Works */}
-      <Card className="p-6 mt-6">
-        <h2 className="text-2xl font-bold mb-4">How It Works</h2>
-        <div className="space-y-3 text-sm">
-          <div className="flex gap-3">
-            <span className="font-bold text-green-500">Level 0:</span>
-            <span>Earn 0.35% (70% of 0.5%) from direct referrals' trading fees</span>
-          </div>
-          <div className="flex gap-3">
-            <span className="font-bold text-blue-500">Level 1:</span>
-            <span>Earn 0.1% (20% of 0.5%) from second-level referrals</span>
-          </div>
-          <div className="flex gap-3">
-            <span className="font-bold text-purple-500">Level 2:</span>
-            <span>Earn 0.05% (10% of 0.5%) from third-level referrals</span>
-          </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleCopy}
+            className="px-4 py-3 bg-[#282828] rounded-xl cursor-pointer border border-[#313131] flex items-center gap-2 hover:bg-[#313131] transition-colors"
+          >
+            <LuCopy className="text-[#00b4d8] w-4 h-4" />
+            <span className="text-white text-base font-medium font-satothi">
+              {copied ? "Copied!" : "Copy"}
+            </span>
+          </motion.button>
         </div>
-      </Card>
+      </div>
+
+      {/* Activity Section */}
+      <div className="flex flex-col gap-3">
+        <h2 className="text-white text-2xl font-medium font-rubik">
+          Activity
+        </h2>
+        <div className="flex flex-col gap-4">
+          {referral?.map((refer, index) => (
+            <motion.div
+              key={index.toString() + refer.referralCode}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <ReferralItem {...refer} />
+            </motion.div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

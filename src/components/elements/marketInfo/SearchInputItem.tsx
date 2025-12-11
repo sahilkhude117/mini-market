@@ -22,7 +22,7 @@ const SearchInputItem: React.FC<SearchInputProps> = ({
         {title}
       </div>
       <div className="self-stretch inline-flex justify-start items-center gap-1">
-        <div className="w-[120px] px-3 py-2 bg-[#111111] rounded-lg outline-1 outline-offset-[-1px] outline-[#313131] flex justify-start items-center">
+        <div className="w-[120px] px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg flex justify-start items-center">
           <input
             type="number"
             placeholder={minPlaceholder}
@@ -31,7 +31,7 @@ const SearchInputItem: React.FC<SearchInputProps> = ({
             className="flex-1 bg-transparent text-[#838587] text-xs font-normal font-satoshi leading-3 outline-none"
           />
         </div>
-        <div className="w-[120px] px-3 py-2 bg-[#111111] rounded-lg outline-1 outline-offset-[-1px] outline-[#313131] flex justify-start items-center">
+        <div className="w-[120px] px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg flex justify-start items-center">
           <input
             type="number"
             placeholder={maxPlaceholder}

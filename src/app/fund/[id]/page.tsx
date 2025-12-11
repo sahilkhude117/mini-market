@@ -55,7 +55,7 @@ export default function FundDetail() {
 
       console.log("status:", active);
 
-      const result = await axios.post("http://localhost:8080/api/market/liquidity", { market_id: market._id, amount: fundAmount, investor: wallet.publicKey?.toBase58(), active });
+      const result = await axios.post("/api/market/liquidity", { market_id: market._id, amount: fundAmount, investor: wallet.publicKey?.toBase58(), active });
 
       if (result.status === 200) {
         infoAlert("Funed successfully!");

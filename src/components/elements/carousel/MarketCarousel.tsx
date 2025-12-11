@@ -5,23 +5,23 @@ import "react-multi-carousel/lib/styles.css";
 
 const MarketCarousel = () => {
   return (
-    <div className="w-full">
+    <div className="w-full max-w-full relative">
       <Carousel
         additionalTransfrom={0}
-        arrows
+        arrows={true}
         autoPlaySpeed={3000}
         centerMode={false}
         className=""
-        containerClass="container"
+        containerClass="container-with-dots"
         dotListClass=""
         draggable
         focusOnSelect={false}
-        infinite
+        infinite={true}
         itemClass="px-2"
         keyBoardControl
         minimumTouchDrag={80}
         pauseOnHover
-        renderArrowsWhenDisabled={false}
+        renderArrowsWhenDisabled={true}
         renderButtonGroupOutside={false}
         renderDotsOutside={false}
         responsive={{
@@ -29,19 +29,19 @@ const MarketCarousel = () => {
             breakpoint: { max: 3000, min: 1024 },
             items: 3,
             slidesToSlide: 1,
-            partialVisibilityGutter: 40
+            partialVisibilityGutter: 0
           },
           tablet: {
             breakpoint: { max: 1024, min: 464 },
             items: 2,
             slidesToSlide: 1,
-            partialVisibilityGutter: 30
+            partialVisibilityGutter: 0
           },
           mobile: {
             breakpoint: { max: 464, min: 0 },
             items: 1,
             slidesToSlide: 1,
-            partialVisibilityGutter: 20
+            partialVisibilityGutter: 0
           }
         }}
         rewind={false}
@@ -52,6 +52,7 @@ const MarketCarousel = () => {
         sliderClass=""
         slidesToSlide={1}
         swipeable
+        partialVisible={false}
       >
         {marketCarouselItems.map((item, index) => (
           <MarketCarouselItem key={index} {...item} />

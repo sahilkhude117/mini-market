@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import Icon from "./Icons";
 import { IconName } from "./Icons/Icons";
 import SearchInputItem from "./marketInfo/SearchInputItem";
-import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 
 const searchInputs = [
   { title: "Volume", minPlaceholder: "Min", maxPlaceholder: "Max" },
@@ -21,15 +20,11 @@ type Category = {
 type NavbarProps = {
   categories: Category[];
   onCategorySelect: (category: string) => void;
-  showRecentActivity?: boolean;
-  onToggleRecentActivity?: () => void;
 };
 
 const Navbar: React.FC<NavbarProps> = ({ 
   categories, 
-  onCategorySelect, 
-  showRecentActivity = true,
-  onToggleRecentActivity 
+  onCategorySelect
 }) => {
   // Keep track of the selected category using state
   const [activeCategory, setActiveCategory] = useState<string>("Trending");
@@ -66,61 +61,48 @@ const Navbar: React.FC<NavbarProps> = ({
   }, []);
 
   return (
-    <nav className="w-full flex justify-between items-center py-4 px-6 bg-[#1a1a1a] relative">
-      <div className="flex items-center lg:gap-6">
+    <nav className="w-full flex items-center justify-between py-4 px-6 bg-white rounded-xl border-2 border-gray-200 relative">
+      <div className="flex items-center gap-3 md:gap-6">
         {categories.map((category, index) => (
           <div
             key={index}
             onClick={() => handleCategorySelect(category.name)}
-            className={`sm:px-5 px-3 pb-3 border-b-[1.5px] inline-flex cursor-pointer justify-start items-center gap-1 transition-all duration-300 ease-in-out relative group ${activeCategory === category.name ? "border-[#07b3ff] text-[#07b3ff]" : "border-transparent text-[#838587] hover:text-[#07b3ff]/80"}`}
+            className={`sm:px-3 px-2 py-1.5 rounded-lg cursor-pointer inline-flex justify-start items-center gap-1 transition-all duration-300 ease-in-out ${activeCategory === category.name ? "border-b-4 border-[#0b1f3a] text-[#0b1f3a] font-extrabold" : "text-[#838587] opacity-70 hover:opacity-100"}`}
           >
-            <div className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#07b3ff] transition-all duration-300 ease-in-out group-hover:w-full" />
-
             <div className="w-5 h-5 relative overflow-hidden">
               <Icon
                 name={category.icon}
-                color={activeCategory === category.name ? "#07b3ff" : "#838587"}
-                className={`transition-all duration-300 ease-in-out hover:text-[#07b3ff]`}
+                color={activeCategory === category.name ? "#0b1f3a" : "#838587"}
+                className={`transition-all duration-300 ease-in-out`}
               />
             </div>
-            <div className={`justify-start md:text-xl text-base font-medium leading-7 ${activeCategory === category.name ? "" : "hidden md:flex"}`}>
+            <div className={`justify-start md:text-base text-sm font-extrabold leading-7 ${activeCategory === category.name ? "" : "hidden md:flex"}`}>
               {category.name}
             </div>
           </div>
         ))}
       </div>
 
-      <div className="flex items-center gap-2">
-
+      <div className="flex items-center gap-2 flex-shrink-0">
         <div
           data-active={showFilter ? "On" : "Off"}
           ref={filterRef}
-          className="sm:px-4 sm:py-2.5 px-2.5 py-1 bg-[#282828] rounded-2xl cursor-pointer outline-1 outline-offset-[-1px] outline-[#313131] flex justify-start items-center gap-2 transition-all duration-300 ease-in-out hover:bg-[#343434] hover:shadow-md active:scale-95 active:bg-[#3c3c3c]"
+          className="sm:px-4 sm:py-2.5 px-2.5 py-1 bg-gray-100 border-2 border-gray-200 rounded-2xl cursor-pointer flex justify-start items-center gap-2 transition-all duration-300 ease-in-out hover:bg-gray-200 hover:shadow-md active:scale-95"
           onClick={handleFilterClick}
         >
           <div className="w-4 h-4 relative overflow-hidden">
-            <Icon name="Filter" color="white" />
+            <Icon name="Filter" color="#0b1f3a" />
           </div>
-          <div className="justify-start hidden lg:flex text-white text-base font-medium font-satoshi leading-normal group-hover:text-[#07b3ff] transition-all duration-300">
+          <div className="justify-start hidden lg:flex text-[#0b1f3a] text-base font-medium font-satoshi leading-normal transition-all duration-300">
             Filter
           </div>
         </div>
-        <button
-          onClick={onToggleRecentActivity}
-          className="sm:px-4 sm:py-2.5 px-2.5 py-1 bg-[#282828] rounded-2xl cursor-pointer outline-1 outline-offset-[-1px] outline-[#313131] flex justify-start items-center gap-2 transition-all duration-300 ease-in-out hover:bg-[#343434] hover:shadow-md active:scale-95 active:bg-[#3c3c3c]"
-        >
-          {showRecentActivity ? (
-            <IoEyeOffOutline className="text-white text-xl" />
-          ) : (
-            <IoEyeOutline className="text-white text-xl" />
-          )}
-        </button>
       </div>
 
       {showFilter && (
         <div
           ref={searchPadRef}
-          className="z-1 p-5 right-[0px] top-[70px] absolute bg-[#1e1e1e] rounded-[20px] shadow-[0px_12px_24px_0px_rgba(5,8,17,1.00)] outline-1 outline-offset-[-1px] outline-[#313131] inline-flex flex-col justify-start items-center gap-4"
+          className="z-1 p-5 right-[0px] top-[70px] absolute bg-white border-2 border-gray-200 rounded-[20px] shadow-[0px_12px_24px_0px_rgba(0,0,0,0.15)] inline-flex flex-col justify-start items-center gap-4"
         >
           {searchInputs.map((input, index) => (
             <SearchInputItem
@@ -132,10 +114,10 @@ const Navbar: React.FC<NavbarProps> = ({
           ))}
           <div className="self-stretch inline-flex justify-start items-start gap-2">
             <div
-              className="flex-1 px-4 cursor-pointer py-2.5 rounded-[100px] outline-1 outline-offset-[-1px] outline-[#838587] flex justify-center items-center gap-1 transition-all duration-300 hover:bg-[#383838] hover:text-white hover:shadow-md active:scale-95"
+              className="flex-1 px-4 cursor-pointer py-2.5 rounded-[100px] border-2 border-[#838587] flex justify-center items-center gap-1 transition-all duration-300 hover:bg-gray-100 hover:shadow-md active:scale-95"
             >
               <div
-                className="justify-center text-[#838587] text-sm font-medium font-satoshi leading-[14px] transition-all duration-300 group-hover:text-white"
+                className="justify-center text-[#838587] text-sm font-medium font-satoshi leading-[14px] transition-all duration-300"
               >
                 Reset
               </div>

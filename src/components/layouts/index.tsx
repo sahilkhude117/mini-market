@@ -5,10 +5,10 @@ import HeaderSideBar from "./header/HeaderSideBar";
 const Layout = ({ children }: { children: ReactNode }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   return (
-    <div className="flex justify-center">
-      <div className="flex md:flex-row flex-col relative max-w-[1920px] w-screen h-screen">
+    <div className="flex justify-center bg-white">
+      <div className="flex md:flex-row flex-col relative max-w-[1920px] w-screen h-screen bg-white">
         <HeaderSideBar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
-        <main className={`h-full w-full flex flex-col gap-6 pb-4 ${isCollapsed ? 'md:ml-[104px]' : 'md:ml-[280px]'}`}>
+        <main className={`h-full w-full flex flex-col gap-6 pb-4 bg-[#f5f5f5] ${isCollapsed ? 'md:ml-[104px]' : 'md:ml-[280px]'}`}>
           <HeaderTop />
           {children}
         </main>

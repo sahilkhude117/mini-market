@@ -1,10 +1,19 @@
 @import "tailwindcss";
 @import "./fonts.css";
 
-
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0b1f3a;
+  color-scheme: light;
+  color: #0b1f3a;
+  background-color: #ffffff;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 @theme {
@@ -18,15 +27,34 @@
   --color-blue: #07b3ff;
   --color-gray: #838587;
   --color-red: #FF6464;
+  --color-primary: #0b1f3a;
 }
 
 body {
-  background: #181a1b;
+  background: #ffffff;
+  color: #0b1f3a;
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#__next {
+  overflow-x: hidden;
+}
+
+a {
+  font-weight: 500;
+  color: #0b1f3a;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #174a8c;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-  /* inverts the color, making black -> white */
+  filter: invert(0);
   cursor: pointer;
 }
 
@@ -34,4 +62,50 @@ input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+/* Carousel arrow styling */
+.react-multi-carousel-list {
+  position: relative;
+  overflow: hidden !important;
+  max-width: 100%;
+}
+
+.react-multi-carousel-track {
+  overflow: visible !important;
+  max-width: 100%;
+}
+
+.react-multiple-carousel__arrow {
+  position: absolute;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 2px solid #e5e7eb !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s ease !important;
+}
+
+.react-multiple-carousel__arrow:hover {
+  background: #ffffff !important;
+  border-color: #0b1f3a !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.react-multiple-carousel__arrow::before {
+  color: #0b1f3a !important;
+  font-size: 18px !important;
+}
+
+.react-multiple-carousel__arrow--left {
+  left: -40px !important;
+}
+
+.react-multiple-carousel__arrow--right {
+  right: -40px !important;
+}
+
+.react-multi-carousel-item {
+  overflow: visible !important;
 }

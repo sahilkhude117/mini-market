@@ -16,18 +16,18 @@ const RecentItem: React.FC<RecentItemProps> = ({ question, timeAgo, userName, ac
   let statusText = '';
 
   if (status === 'yes') {
-    statusStyles = 'bg-[#111111] outline-[#3fd145] text-[#3fd145]';
+    statusStyles = 'bg-white border-2 border-[#3fd145] text-[#3fd145]';
     statusText = 'Yes';
   } else if (status === 'no') {
-    statusStyles = 'bg-[#111111] outline-[#ff6464] text-[#ff6464]';
+    statusStyles = 'bg-white border-2 border-[#ff6464] text-[#ff6464]';
     statusText = 'No';
   } else {
-    statusStyles = 'bg-[#111111] outline-[#07b3ff] text-[#07b3ff]';
+    statusStyles = 'bg-white border-2 border-[#0b1f3a] text-[#0b1f3a]';
     statusText = 'Funded';
   }
 
   return (
-    <div data-type="Vote" className="self-stretch sm:h-20 p-4 bg-[#1e1e1e] rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] inline-flex justify-start items-center gap-4">
+    <div data-type="Vote" className="self-stretch sm:h-20 p-4 bg-white rounded-2xl border-2 border-gray-200 inline-flex justify-start items-center gap-4">
       <div className="flex-1 inline-flex flex-col justify-center items-start gap-1">
         <div className="self-stretch inline-flex justify-start items-center gap-1.5">
           <div className="justify-start text-[#838587] md:text-sm font-medium font-rubik leading-normal">{question}</div>
@@ -36,10 +36,10 @@ const RecentItem: React.FC<RecentItemProps> = ({ question, timeAgo, userName, ac
         <div className="self-stretch inline-flex justify-start items-center gap-1">
           <img className="w-4 h-4 rounded-[10px]" src={imageSrc} alt="user" />
           <div className="justify-start">
-            <span className="text-white text-sm font-semibold font-interSemi underline leading-[18px]">{userName}</span>
-            <span className="text-white text-sm font-semibold font-interSemi leading-[18px]"> {action} </span>
+            <span className="text-[#0b1f3a] text-sm font-semibold font-interSemi underline leading-[18px]">{userName}</span>
+            <span className="text-[#0b1f3a] text-sm font-semibold font-interSemi leading-[18px]"> {action} </span>
           </div>
-          <div className={`p-1 ${statusStyles} rounded-lg shadow-[inset_0px_2px_0px_0px_rgba(255,255,255,0.16)] outline-1 outline-offset-[-1px] flex justify-center items-center gap-0.5`}>
+          <div className={`p-1 ${statusStyles} rounded-lg flex justify-center items-center gap-0.5`}>
             {status !== 'funded' ? (
               <div className="w-3 h-3 relative overflow-hidden">
                 <Icon name={status} size={12} />
@@ -49,12 +49,12 @@ const RecentItem: React.FC<RecentItemProps> = ({ question, timeAgo, userName, ac
               {statusText}
             </div>
           </div>
-          <div className="justify-start text-white text-sm font-semibold font-interSemi leading-[18px]">
+          <div className="justify-start text-[#0b1f3a] text-sm font-semibold font-interSemi leading-[18px]">
            for {price}
           </div>
         </div>
       </div>
-      <img className="w-10 h-10 rounded-lg" src="https://placehold.co/40x40" alt="item" />
+      <img className="w-10 h-10 rounded-lg border-2 border-gray-200" src="https://placehold.co/40x40" alt="item" />
     </div>
   );
 };

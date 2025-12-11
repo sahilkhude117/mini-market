@@ -9,7 +9,6 @@ const sidebarNavList = [
   { label: "ProposeMarket", href: "/propose" },
   { label: "Referral", href: "/referral" },
   { label: "Profile", href: "/profile" },
-  { label: "About", href: "/about" },
 ] as const;
 
 const SidebarNav: React.FC<SidebarNavProps> = ({ isCollapsed }) => {
@@ -28,21 +27,6 @@ const SidebarNav: React.FC<SidebarNavProps> = ({ isCollapsed }) => {
           isCollapsed={isCollapsed} // Pass the prop
         />
       ))}
-      {/* Bottom Image - Hide when Collapsed */}
-      {!isCollapsed && (
-        <div className="absolute bottom-0 left-1.5">
-          <img
-            src="/spec.png"
-            className="w-[221px] h-[210px] left-[-44px] top-[801px]  mix-blend-screen"
-          />
-        </div>
-      )}
-      <div className="md:hidden absolute bottom-0 left-1.5">
-          <img
-            src="/spec.png"
-            className="w-[221px] h-[210px] left-[-44px] top-[801px]  mix-blend-screen"
-          />
-        </div>
     </nav>
   );
 };

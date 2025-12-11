@@ -74,37 +74,37 @@ export default function Referral() {
       <div className="grid grid-cols-2 gap-6">
         <motion.div 
           whileHover={{ scale: 1.02 }}
-          className="p-6 bg-gradient-to-r from-[#1e1e1e] to-[#282828] rounded-xl border border-[#313131]"
+          className="p-6 bg-white rounded-xl border-4 border-black shadow-lg"
         >
           <div className="flex items-center gap-3 mb-2">
-            <FaUserFriends className="text-[#00b4d8] text-xl" />
-            <h3 className="text-white text-lg font-medium">Active Referrals</h3>
+            <FaUserFriends className="text-[#0b1f3a] text-xl" />
+            <h3 className="text-[#0b1f3a] text-lg font-bold">Active Referrals</h3>
           </div>
-          <p className="text-[#00b4d8] text-2xl font-bold">{referral?.length}</p>
+          <p className="text-[#0b1f3a] text-2xl font-extrabold">{referral?.length}</p>
         </motion.div>
         <motion.div 
           whileHover={{ scale: 1.02 }}
-          className="p-6 bg-gradient-to-r from-[#1e1e1e] to-[#282828] rounded-xl border border-[#313131]"
+          className="p-6 bg-white rounded-xl border-4 border-black shadow-lg"
         >
           <div className="flex items-center gap-3 mb-2">
-            <FaCoins className="text-[#00b4d8] text-xl" />
-            <h3 className="text-white text-lg font-medium">Total Earnings</h3>
+            <FaCoins className="text-[#0b1f3a] text-xl" />
+            <h3 className="text-[#0b1f3a] text-lg font-bold">Total Earnings</h3>
           </div>
           <div className="flex items-center gap-2">
-            <p className="text-[#00b4d8] text-2xl font-bold"></p>
-            <span className="text-[#00b4d8] text-2xl font-bold">{referral?.reduce((sum, i) => sum + i.fee, 0)} SOL</span>
+            <p className="text-[#0b1f3a] text-2xl font-extrabold"></p>
+            <span className="text-[#0b1f3a] text-2xl font-extrabold">{referral?.reduce((sum, i) => sum + i.fee, 0)} SOL</span>
           </div>
         </motion.div>
       </div>
 
       {/* Referral Link Section */}
       <div className="flex flex-col gap-3">
-        <h2 className="text-white text-2xl font-medium font-rubik">
+        <h2 className="text-[#0b1f3a] text-2xl font-extrabold font-rubik">
           Your Personal Referral Link
         </h2>
-        <div className="h-[60px] p-2 bg-[#1e1e1e] rounded-xl border border-[#313131] flex items-center gap-3">
+        <div className="h-[60px] p-2 bg-white rounded-xl border-4 border-black flex items-center gap-3 shadow-lg">
           <div className="flex-1 px-6 py-3 rounded-lg">
-            <div className="text-[#838587] text-xl font-medium font-satothi">
+            <div className="text-[#0b1f3a] text-xl font-medium font-satothi">
               {updating?"Updating..." : referralCode}
             </div>
           </div>
@@ -112,10 +112,10 @@ export default function Referral() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleCopy}
-            className="px-4 py-3 bg-[#282828] rounded-xl cursor-pointer border border-[#313131] flex items-center gap-2 hover:bg-[#313131] transition-colors"
+            className="px-4 py-3 bg-white rounded-xl cursor-pointer border-2 border-black flex items-center gap-2 hover:bg-gray-100 transition-colors"
           >
-            <LuCopy className="text-[#00b4d8] w-4 h-4" />
-            <span className="text-white text-base font-medium font-satothi">
+            <LuCopy className="text-[#0b1f3a] w-4 h-4" />
+            <span className="text-[#0b1f3a] text-base font-bold font-satothi">
               {copied ? "Copied!" : "Copy"}
             </span>
           </motion.button>
@@ -124,7 +124,7 @@ export default function Referral() {
 
       {/* Activity Section */}
       <div className="flex flex-col gap-3">
-        <h2 className="text-white text-2xl font-medium font-rubik">
+        <h2 className="text-[#0b1f3a] text-2xl font-extrabold font-rubik">
           Activity
         </h2>
         <div className="flex flex-col gap-4">

@@ -25,10 +25,10 @@ const HeaderTop: React.FC<HeaderTopProps> = ({ isCollapsed }) => {
 
   return (
     <div className="flex flex-col relative">
-      <div className="self-stretch  px-[50px] py-4 inline-flex justify-between items-center w-full">
+      <div className="self-stretch px-[50px] py-4 flex justify-between items-center w-full max-w-full overflow-x-hidden">
         <div className="flex gap-2 items-center md:hidden">
           <div className="w-4 h-4 md:hidden relative overflow-hidden">
-            <RxHamburgerMenu size={16} className="text-white" />
+            <RxHamburgerMenu size={16} className="text-[#0b1f3a]" />
           </div>
           <div className="flex-1 md:hidden flex justify-start items-center gap-2">
             <Link href="/">
@@ -36,9 +36,9 @@ const HeaderTop: React.FC<HeaderTopProps> = ({ isCollapsed }) => {
             </Link>
             <Link
               href="/"
-              className="text-xl leading-9 font-normal font-['anton'] text-white uppercase"
+              className="text-xl leading-9 font-normal font-['anton'] text-[#0b1f3a] uppercase"
             >
-              speculape
+              minimarket
             </Link>
           </div>
         </div>
@@ -46,24 +46,24 @@ const HeaderTop: React.FC<HeaderTopProps> = ({ isCollapsed }) => {
         <div className="md:flex hidden justify-start items-center gap-5">
           {/* Market Tab Switch */}
           {pathname === "/" ? (
-            <div className="p-0.5 bg-[#111111] rounded-[18px] outline-1 outline-offset-[-1px] outline-[#313131] flex">
+            <div className="p-0.5 bg-gray-100 rounded-[18px] border-2 border-gray-200 flex">
               {/* Active Market Button */}
               <button
                 onClick={() => setActiveTab("ACTIVE")}
                 className={`px-4 py-2.5 rounded-2xl flex items-center cursor-pointer gap-2 transition-all duration-300
         ${activeTab === "ACTIVE"
-                    ? "bg-[#282828] shadow-[inset_0px_2px_0px_0px_rgba(53,53,53,1.00)]"
-                    : "bg-transparent hover:bg-[#2a2a2a] hover:shadow-md hover:scale-95"
+                    ? "bg-white border-b-4 border-[#0b1f3a] font-extrabold"
+                    : "bg-transparent hover:bg-gray-50 hover:shadow-md"
                   }`}
               >
                 <Icon
                   name="ActiveMarket"
-                  color={activeTab === "ACTIVE" ? "#FF6464" : "#838587"}
+                  color={activeTab === "ACTIVE" ? "#0b1f3a" : "#838587"}
                   className="transition-all duration-300 ease-in-out hover:scale-110"
                 />
                 <span
                   className={`text-base font-medium font-satoshi leading-normal transition-all duration-300 ease-in-out
-          ${activeTab === "ACTIVE" ? "text-white" : "text-[#838587]"}`}
+          ${activeTab === "ACTIVE" ? "text-[#0b1f3a] font-extrabold" : "text-[#838587] opacity-70"}`}
                 >
                   Active Market
                 </span>
@@ -74,18 +74,18 @@ const HeaderTop: React.FC<HeaderTopProps> = ({ isCollapsed }) => {
                 onClick={() => setActiveTab("PENDING")}
                 className={`px-4 py-2.5 rounded-2xl flex items-center cursor-pointer gap-2 transition-all duration-300
         ${activeTab === "PENDING"
-                    ? "bg-[#282828] shadow-[inset_0px_2px_0px_0px_rgba(53,53,53,1.00)]"
-                    : "bg-transparent hover:bg-[#2a2a2a] hover:shadow-md hover:scale-95"
+                    ? "bg-white border-b-4 border-[#0b1f3a] font-extrabold"
+                    : "bg-transparent hover:bg-gray-50 hover:shadow-md"
                   }`}
               >
                 <Icon
                   name="PendingMarket"
-                  color={activeTab === "PENDING" ? "#FF6464" : "#838587"}
+                  color={activeTab === "PENDING" ? "#0b1f3a" : "#838587"}
                   className="transition-all duration-300 ease-in-out hover:scale-110"
                 />
                 <span
                   className={`text-base font-medium font-satoshi leading-normal transition-all duration-300 ease-in-out
-          ${activeTab === "PENDING" ? "text-white" : "text-[#838587]"}`}
+          ${activeTab === "PENDING" ? "text-[#0b1f3a] font-extrabold" : "text-[#838587] opacity-70"}`}
                 >
                   Pending Market
                 </span>
@@ -96,16 +96,16 @@ const HeaderTop: React.FC<HeaderTopProps> = ({ isCollapsed }) => {
           )}
 
           {/* Search Bar */}
-          <div className="2xl:w-[480px] hidden px-4 py-3 bg-[#1e1e1e]  rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] lg:flex lg:w-auto justify-start items-center gap-3">
+          <div className="2xl:w-[480px] hidden px-4 py-3 bg-white border-2 border-gray-200 rounded-2xl lg:flex lg:w-auto justify-start items-center gap-3">
             <span className="pointer-events-none">
               <Icon name="Search" />
             </span>
             <input
               type="text"
               placeholder="Search"
-              className="flex-1 bg-transparent hover:text-gray-400 text-[#838587] text-base font-medium font-satoshi leading-normal outline-none"
+              className="flex-1 bg-transparent hover:text-gray-600 text-[#838587] text-base font-medium font-satoshi leading-normal outline-none"
             />
-            <div className="px-2 py-1 bg-[#111111] rounded-lg outline-1 outline-offset-[-1px] outline-[#313131] flex justify-center items-center gap-2.5">
+            <div className="px-2 py-1 bg-gray-100 border border-gray-200 rounded-lg flex justify-center items-center gap-2.5">
               <span className="text-[#838587] cursor-pointer text-sm font-medium font-satoshi leading-none">
                 ⌘V
               </span>
@@ -114,17 +114,18 @@ const HeaderTop: React.FC<HeaderTopProps> = ({ isCollapsed }) => {
         </div>
 
         {/* Language Selector & Wallet Button */}
-        <div className="flex justify-start items-center gap-5">
+        <div className="flex justify-end items-center gap-2 md:gap-3 lg:gap-5 flex-shrink-0">
           {/* Language Selector */}
           <div
-            className="px-4 py-2.5 bg-[#282828] rounded-2xl xl:flex hidden justify-center items-center gap-2 
-    transition-all duration-300 ease-in-out hover:bg-[#3a3a3a] hover:shadow-md cursor-pointer"
+            className="px-3 md:px-4 py-2.5 bg-gray-100 border-2 border-gray-200 rounded-2xl lg:flex hidden justify-center items-center gap-2 
+    transition-all duration-300 ease-in-out hover:bg-gray-200 hover:shadow-md cursor-pointer flex-shrink-0"
           >
-            <span className="text-white text-lg font-medium font-satoshi leading-7 transition-all duration-300 ease-in-out hover:text-[#07b3ff]">
+            <span className="text-[#0b1f3a] text-lg font-medium font-satoshi leading-7 transition-all duration-300 ease-in-out hover:text-[#174a8c]">
               EN
             </span>
             <Icon
               name="Down"
+              color="#0b1f3a"
               className="transition-all duration-300 ease-in-out hover:rotate-180"
             />
           </div>
@@ -146,12 +147,12 @@ const HeaderTop: React.FC<HeaderTopProps> = ({ isCollapsed }) => {
               Connect Wallet
             </span>
           </button> */}
-          <WalletMultiButton style={{ borderRadius: "15px", backgroundColor: "#07B3FF", color: "#000", boxShadow: "inset 0px 2px 0px 0px rgba(255,255,255,0.16)" }} ></WalletMultiButton>
+          <WalletMultiButton style={{ borderRadius: "15px", backgroundColor: "#0b1f3a", color: "#fff", boxShadow: "0 2px 8px rgba(0,0,0,0.15)", border: "2px solid #0b1f3a" }} ></WalletMultiButton>
         </div>
       </div>
       <div className="px-[50px]">
         {/* Search Bar */}
-        <div className="lg:hidden px-4 py-3 bg-[#1e1e1e] rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] flex justify-start items-center gap-3">
+        <div className="lg:hidden px-4 py-3 bg-white border-2 border-gray-200 rounded-2xl flex justify-start items-center gap-3">
           <span className="cursor-pointer">
             <Icon name="Search" />
           </span>
@@ -160,7 +161,7 @@ const HeaderTop: React.FC<HeaderTopProps> = ({ isCollapsed }) => {
             placeholder="Search"
             className="flex-1 bg-transparent text-[#838587] md:text-base text-sm font-medium font-satoshi leading-normal outline-none"
           />
-          <div className="px-2 py-1 bg-[#111111] rounded-lg outline-1 outline-offset-[-1px] outline-[#313131] flex justify-center items-center gap-2.5">
+          <div className="px-2 py-1 bg-gray-100 border border-gray-200 rounded-lg flex justify-center items-center gap-2.5">
             <span className="text-[#838587] cursor-pointer text-sm font-medium font-satoshi leading-none">
               ⌘V
             </span>

@@ -22,15 +22,15 @@ const SidebarNavItem: FC<SidebarNavItemProps> = ({
         } 
         ${
           isActive
-            ? "bg-gradient-to-r from-blue/10 to-white/0 rounded-xl outline-blue outline-1 outline-offset-[-1px]"
-            : "hover:bg-[#2a2a2a] hover:rounded-xl"
+            ? "bg-[#f0f4f8] rounded-xl border-b-4 border-[#0b1f3a]"
+            : "hover:bg-gray-100 hover:rounded-xl"
         }
         inline-flex items-center gap-3 cursor-pointer z-1`}
     >
       <Icon
         name={label}
         size={24}
-        color={isActive ? "#07b3ff" : "#838587"}
+        color={isActive ? "#0b1f3a" : "#838587"}
         className="transition-all duration-300 ease-in-out hover:scale-110"
       />
 
@@ -38,7 +38,7 @@ const SidebarNavItem: FC<SidebarNavItemProps> = ({
       {!isCollapsed && (
         <div
           className={`justify-start font-satoshi text-xl font-medium leading-7 transition-all duration-300 ease-in-out
-          ${isActive ? "text-blue" : "text-gray"}`}
+          ${isActive ? "text-[#0b1f3a] font-extrabold" : "text-gray opacity-70"}`}
         >
           {label}
         </div>
@@ -46,7 +46,7 @@ const SidebarNavItem: FC<SidebarNavItemProps> = ({
 
       <div
         className={`justify-start md:hidden font-satoshi text-xl font-medium leading-7 transition-all  duration-300 ease-in-out
-          ${isActive ? "text-blue" : "text-gray"}`}
+          ${isActive ? "text-[#0b1f3a] font-extrabold" : "text-gray opacity-70"}`}
       >
         {label}
       </div>

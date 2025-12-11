@@ -54,7 +54,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
         token: token,
       });
 
-      const res = await axios.post("http://localhost:8080/api/market/betting", {
+      const res = await axios.post("/api/market/betting", {
         player: wallet.publicKey.toBase58(),
         market_id: markets[index]._id,
         amount: 1000,
@@ -65,7 +65,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
 
       if (res.status === 200) {
         infoAlert("Successfully betted!");
-        const marketData = await axios.get(`http://localhost:8080/api/market/get?page=${currentPage}&limit=10&marketStatus=ACTIVE&marketField=0`);
+        const marketData = await axios.get(`/api/market/get?page=${currentPage}&limit=10&marketStatus=ACTIVE&marketField=0`);
         formatMarketData(marketData.data.data);
       }
     } catch (error) {
@@ -77,13 +77,13 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 32 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ scale: 1.025, boxShadow: "0 8px 32px 0 rgba(7,179,255,0.10)" }}
+      whileHover={{ scale: 1.025, boxShadow: "0 8px 32px 0 rgba(0,0,0,0.10)" }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="lg:p-6 p-4 bg-[#1e1e1e] rounded-2xl outline-1 outline-offset-[-1px] shadow-xl/20 outline-[#313131] inline-flex flex-col justify-start items-start lg:gap-6 gap-4"
+      className="lg:p-6 p-4 bg-white rounded-2xl border-2 border-gray-200 shadow-lg inline-flex flex-col justify-start items-start lg:gap-6 gap-4"
     >
       <div className="self-stretch flex flex-col justify-start items-start gap-2">
         <div className="self-stretch inline-flex justify-start items-center gap-2">
-          <div className="flex-1 justify-start text-[#07b3ff] lg:text-base text-xs font-semibold font-Inter leading-normal">
+          <div className="flex-1 justify-start text-[#0b1f3a] lg:text-base text-xs font-semibold font-Inter leading-normal">
             {elipsKey(markets[index].feedName)}
           </div>
           <div className="flex justify-start items-center gap-1">
@@ -95,21 +95,21 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
             </div>
           </div>
           <div className="lg:w-5 lg:h-5 w-4 h-4 relative overflow-hidden">
-            <FaRegStar className="text-white" />
+            <FaRegStar className="text-[#0b1f3a]" />
           </div>
         </div>
         <div className="self-stretch inline-flex justify-start items-start gap-4">
-          <div className="flex-1 h-overflow-auto justify-start text-white lg:text-2xl text-lg font-medium font-rubik">
+          <div className="flex-1 h-overflow-auto justify-start text-[#0b1f3a] lg:text-2xl text-lg font-medium font-rubik">
             {markets[index].question}
           </div>
-          <img className="lg:w-14 lg:h-14 w-12 h-12 rounded-lg" src={markets[index].imageUrl} alt={markets[index].feedName} />
+          <img className="lg:w-14 lg:h-14 w-12 h-12 rounded-lg border-2 border-gray-200" src={markets[index].imageUrl} alt={markets[index].feedName} />
         </div>
         
         {/* Market Stats */}
         <div className="self-stretch grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-1">
             <div className="text-[#838587] text-sm font-semibold">Volume</div>
-            <div className="text-white text-sm font-semibold">{markets[index].totalInvestment} SOL</div>
+            <div className="text-[#0b1f3a] text-sm font-semibold">{markets[index].totalInvestment} SOL</div>
           </div>
           <div className="flex flex-col gap-1">
             <div className="text-[#838587] text-sm font-semibold">Time Remaining</div>
@@ -124,7 +124,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
         <div className="self-stretch flex flex-col gap-2">
           <div className="flex justify-between items-center">
             <div className="text-[#838587] text-sm font-semibold">Percent Chance</div>
-            <div className="text-white text-sm font-semibold">
+            <div className="text-[#0b1f3a] text-sm font-semibold">
               {Math.floor(markets[index].playerACount / (markets[index].playerACount + markets[index].playerBCount) * 100)}%
             </div>
           </div>
@@ -137,7 +137,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="flex-1 px-4 py-2.5 bg-[#223a25] outline outline-[#3fd145] rounded-2xl cursor-pointer transition-all duration-200 flex justify-center items-center gap-2"
+          className="flex-1 px-4 py-2.5 bg-white border-2 border-[#3fd145] rounded-2xl cursor-pointer transition-all duration-200 flex justify-center items-center gap-2 hover:bg-[#f0fff0]"
           onClick={() => onVote(true, markets[index].tokenA)}
         >
           <span className="w-5 h-5 flex items-center justify-center">
@@ -148,7 +148,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="flex-1 px-4 py-2.5 bg-[#3a2222] outline outline-[#ff6464] rounded-2xl cursor-pointer transition-all duration-200 flex justify-center items-center gap-2"
+          className="flex-1 px-4 py-2.5 bg-white border-2 border-[#ff6464] rounded-2xl cursor-pointer transition-all duration-200 flex justify-center items-center gap-2 hover:bg-[#fff0f0]"
           onClick={() => onVote(false, markets[index].tokenB)}
         >
           <span className="w-5 h-5 flex items-center justify-center">

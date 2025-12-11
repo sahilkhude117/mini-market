@@ -327,7 +327,7 @@ export default function Propose() {
         data.question = data.range? `Will ${elipsKey(data.feedName)} reach a market cap of $ ${data.value} by ${data.date}?` : `Will ${elipsKey(data.feedName)} reach a per token price of $ ${data.value} by ${data.date}?`
       }
 
-      const res = await axios.post("http://localhost:8080/api/market/create", { data, isChecked });
+      const res = await axios.post("/api/market/create", { data, isChecked });
       const market_id = res.data.result;
 
       const cluster = process.env.CLUSTER === "Mainnet" ? "Mainnet" : "Devnet";
@@ -345,7 +345,7 @@ export default function Propose() {
 
       console.log("create result:", create_result);
 
-      const update_res = await axios.post("http://localhost:8080/api/market/add", { data: { ...create_result, id: market_id } });
+      const update_res = await axios.post("/api/market/add", { data: { ...create_result, id: market_id } });
 
       if (update_res.status === 200) {
         infoAlert("Market created successfully!");
@@ -387,10 +387,10 @@ export default function Propose() {
   }
   return (
     <div className="px-[50px] flex-col 2xl:flex-row self-stretch inline-flex justify-start items-start gap-[50px] overflow-auto relative">
-      <div className="flex-1 p-8 bg-[#1e1e1e] rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] inline-flex flex-col justify-center items-center gap-8 relative">
-        {active ? "" : <div className="absolute flex justify-center items-center w-full h-full bg-[#1e1e1e]/50 backdrop-blur-sm z-20 rounded-2xl">
+      <div className="flex-1 p-8 bg-white rounded-2xl border-4 border-black inline-flex flex-col justify-center items-center gap-8 relative shadow-lg">
+        {active ? "" : <div className="absolute flex justify-center items-center w-full h-full bg-white/80 backdrop-blur-sm z-20 rounded-2xl">
           <ClipLoader
-            color="#ffffff"
+            color="#0b1f3a"
             size={300}
             aria-label="Loading Spinner"
             data-testid="loader"
@@ -399,10 +399,10 @@ export default function Propose() {
         
         {/* Header Section */}
         <div className="self-stretch flex flex-col justify-start items-start gap-2">
-          <div className="justify-start text-white text-[40px] font-medium font-rubik leading-[48px]">
+          <div className="justify-start text-[#0b1f3a] text-[40px] font-extrabold font-rubik leading-[48px]">
             Create Your Prediction Market
           </div>
-          <div className="justify-start text-[#838587] text-lg font-medium font-satoshi leading-relaxed">
+          <div className="justify-start text-[#0b1f3a]/70 text-lg font-medium font-satoshi leading-relaxed">
             Fill in the blanks to create your market!
           </div>
         </div>
@@ -413,18 +413,18 @@ export default function Propose() {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Left Column: Image Upload */}
             <div className="flex flex-col gap-4 lg:w-1/4">
-              <div className="text-white text-xl font-semibold tracking-tight">Step 1: Add a Market Image</div>
+              <div className="text-[#0b1f3a] text-xl font-bold tracking-tight">Step 1: Add a Market Image</div>
               <div className="flex flex-col gap-2">
-                <label className="w-full h-[200px] bg-[#111111] rounded-2xl cursor-pointer border-2 border-dashed border-[#313131] flex flex-col justify-center items-center gap-4 relative hover:bg-[#181a1a] transition-colors shadow-lg">
+                <label className="w-full h-[200px] bg-white rounded-lg cursor-pointer border-2 border-dashed border-black flex flex-col justify-center items-center gap-4 relative hover:border-[#0b1f3a] transition-colors">
                   {previewUrl && (
                     <img
                       src={previewUrl}
                       alt="Preview"
-                      className="absolute inset-0 w-full h-full object-cover rounded-2xl"
+                      className="absolute inset-0 w-full h-full object-cover rounded-lg"
                     />
                   )}
-                  <FiUpload size={28} color="#07b3ff" />
-                  <div className="text-[#838587] text-base font-medium text-center px-4">
+                  <FiUpload size={28} color="#0b1f3a" />
+                  <div className="text-[#0b1f3a]/70 text-base font-medium text-center px-4">
                     <input
                       type="file"
                       accept="image/*"
@@ -434,7 +434,7 @@ export default function Propose() {
                     {isUploading ? "Uploading..." : "Click to upload image"}
                   </div>
                 </label>
-                <div className="text-[#838587] text-xs">*File format jpg, png, img. max size 5mb</div>
+                <div className="text-[#0b1f3a]/60 text-xs">*File format jpg, png, img. max size 5mb</div>
                 <div className={`text-red text-sm ${error.imageUrl !== "" ? "" : "invisible"}`}>*Invalid Image</div>
               </div>
             </div>
@@ -443,9 +443,9 @@ export default function Propose() {
             <div className="flex flex-col gap-8 lg:w-3/4">
               {/* Market Category Selection */}
               <div className="flex flex-col gap-4 relative">
-                <div className="text-white text-xl font-medium">Step 2: Choose Your Market Category</div>
+                <div className="text-[#0b1f3a] text-xl font-bold">Step 2: Choose Your Market Category</div>
                 <button 
-                  className="w-full text-[#838587] px-4 py-3.5 text-lg font-medium bg-[#111111] rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] flex justify-between items-center hover:bg-[#1a1a1a] transition-colors" 
+                  className="w-full text-[#0b1f3a] px-4 py-3 text-lg font-medium bg-white rounded-lg border-2 border-black flex justify-between items-center hover:bg-gray-50 transition-colors" 
                   onClick={() => setMarketFieldOpen(!marketFieldOpen)}
                 >
                   {marketField[marketFieldIndex].name}
@@ -454,11 +454,11 @@ export default function Propose() {
                   </svg>
                 </button>
                 {marketFieldOpen && (
-                  <div id="market_catagory" className="w-full bg-[#111111] rounded-2xl outline-1 outline-offset-[-1px] absolute left-0 bottom-[-100px] z-10 outline-[#313131]">
+                  <div id="market_catagory" className="w-full bg-white rounded-lg border-2 border-black absolute left-0 bottom-[-100px] z-10 shadow-lg">
                     {marketField.map((field, index) => (
                       <div
                         key={"market-field-" + index }
-                        className="px-4 py-3 hover:bg-[#1a1a1a] cursor-pointer transition-colors text-white"
+                        className="px-4 py-3 hover:bg-gray-100 cursor-pointer transition-colors text-[#0b1f3a] border-b border-gray-200 last:border-b-0"
                         onClick={() => {
                           setMarketFieldIndex(index);
                           setMarketFieldOpen(false);
@@ -482,13 +482,13 @@ export default function Propose() {
               {/* Sports Selection or API Selection */}
               {marketField[marketFieldIndex].name === "Sports Prediction Market" ? (
                 <div className="space-y-4">
-                  <div className="text-white text-xl font-medium">Step 3: Select Your Sport</div>
+                  <div className="text-[#0b1f3a] text-xl font-bold">Step 3: Select Your Sport</div>
                   
                   {/* Sport Selection */}
                   <div className="relative">
-                    {/* <div className="text-[#838587] text-lg mb-2">Select Sport</div> */}
+                    {/* <div className="text-[#0b1f3a]/70 text-lg mb-2">Select Sport</div> */}
                     <button 
-                      className="w-full text-[#838587] px-4 py-3.5 text-lg font-medium bg-[#111111] rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] flex justify-between items-center hover:bg-[#1a1a1a] transition-colors" 
+                      className="w-full text-[#0b1f3a] px-4 py-3 text-lg font-medium bg-white rounded-lg border-2 border-black flex justify-between items-center hover:bg-gray-50 transition-colors" 
                       onClick={() => setSportOpen(!sportOpen)}
                     >
                       {selectedSport ? selectedSport.charAt(0).toUpperCase() + selectedSport.slice(1) : "Select a sport"}
@@ -497,11 +497,11 @@ export default function Propose() {
                       </svg>
                     </button>
                     {sportOpen && (
-                      <div className="absolute z-10 w-full mt-1 bg-[#111111] rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] shadow-lg">
+                      <div className="absolute z-10 w-full mt-1 bg-white rounded-lg border-2 border-black shadow-lg">
                         {Object.keys(sportsData).map((sport) => (
                           <div
                             key={sport}
-                            className="px-4 py-3 hover:bg-[#1a1a1a] cursor-pointer transition-colors text-white"
+                            className="px-4 py-3 hover:bg-gray-100 cursor-pointer transition-colors text-[#0b1f3a] border-b border-gray-200 last:border-b-0"
                             onClick={() => {
                               setSelectedSport(sport);
                               setSelectedLeague("");
@@ -519,9 +519,9 @@ export default function Propose() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-4 relative">
-                  <div className="text-white text-xl font-medium">Step 3: Select Your Data Source</div>
+                  <div className="text-[#0b1f3a] text-xl font-bold">Step 3: Select Your Data Source</div>
                   <button 
-                    className="w-full text-[#838587] px-4 py-3.5 text-lg font-medium bg-[#111111] rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] flex justify-between items-center hover:bg-[#1a1a1a] transition-colors" 
+                    className="w-full text-[#0b1f3a] px-4 py-3 text-lg font-medium bg-white rounded-lg border-2 border-black flex justify-between items-center hover:bg-gray-50 transition-colors" 
                     onClick={() => setMarketFieldContentOpen(!marketFieldContentOpen)}
                   >
                     {marketField[marketFieldIndex].content[marketFieldContentIndex].api_name}
@@ -531,11 +531,11 @@ export default function Propose() {
                   </button>
 
                   {marketFieldContentOpen && (
-                    <div className="w-full bg-[#111111] rounded-2xl outline-1 outline-offset-[-1px] absolute left-0 bottom-[-100px] z-10 outline-[#313131]">
+                    <div className="w-full bg-white rounded-lg border-2 border-black absolute left-0 bottom-[-100px] z-10 shadow-lg">
                       {marketField[marketFieldIndex].content.map((field, index) => (
                         <div
                           key={index}
-                          className="px-4 py-3 hover:bg-[#1a1a1a] cursor-pointer transition-colors text-white"
+                          className="px-4 py-3 hover:bg-gray-100 cursor-pointer transition-colors text-[#0b1f3a] border-b border-gray-200 last:border-b-0"
                           onClick={() => chnageDataSource(index)}
                         >
                           {field.api_name}
@@ -553,33 +553,35 @@ export default function Propose() {
 
           {/* Question Building Section */}
           <div className="flex flex-col gap-8">
-            <div className="text-white text-xl font-medium">Step 4: Build Your Prediction Question</div>
+            <div className="text-[#0b1f3a] text-xl font-bold">Step 4: Build Your Prediction Question</div>
 
             {/* Question Preview Card - always at the top */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 30 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
-              className="flex flex-col gap-4 p-8 bg-gradient-to-br from-[#181a1b] to-[#232a32] rounded-3xl border border-[#07b3ff]/30 shadow-xl relative overflow-hidden group"
+              className="flex flex-col gap-4 p-8 bg-white rounded-2xl border-4 border-black shadow-lg relative overflow-hidden group"
             >
               {/* Rippling effect overlay */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#07b3ff]/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-100/50 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
-                className="text-white text-2xl font-bold tracking-tight flex items-center gap-2"
+                className="text-[#0b1f3a] text-2xl font-extrabold tracking-tight flex items-center gap-2"
               >
-                <GoQuestion size={28} className="text-[#07b3ff]" />
+                <GoQuestion size={28} className="text-[#0b1f3a]" />
                 Your Question Preview
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.35, duration: 0.5 }}
-                className="text-[#07b3ff] text-xl font-semibold drop-shadow-lg"
+                className="text-[#0b1f3a] text-xl font-bold"
               >
-                {marketField[marketFieldIndex].name === "Sports Prediction Market" ? (
+                {marketField[marketFieldIndex].name === "Custom Market" ? (
+                  data.description || "Please enter your prediction question below"
+                ) : marketField[marketFieldIndex].name === "Sports Prediction Market" ? (
                   selectedTeam ? (
                     selectedStatType === "next_game" ? (
                       predictionOutcome ? (
@@ -617,9 +619,9 @@ export default function Propose() {
                 <div className="flex flex-col gap-6">
                   {/* League Selection */}
                   <div className="relative">
-                    <div className="text-[#838587] text-lg mb-2">Select League</div>
+                    <div className="text-[#0b1f3a] text-sm font-bold mb-2">Select League</div>
                     <button 
-                      className="w-full text-[#838587] px-4 py-3.5 text-lg font-medium bg-[#111111] rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] flex justify-between items-center hover:bg-[#1a1a1a] transition-colors" 
+                      className="w-full text-[#0b1f3a] px-4 py-3 text-lg font-medium bg-white rounded-lg border-2 border-black flex justify-between items-center hover:bg-gray-50 transition-colors" 
                       onClick={() => setLeagueOpen(!leagueOpen)}
                     >
                       {selectedLeague || "Select a league"}
@@ -628,11 +630,11 @@ export default function Propose() {
                       </svg>
                     </button>
                     {leagueOpen && (
-                      <div className="absolute z-10 w-full mt-2 bg-[#111111] rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] shadow-lg">
+                      <div className="absolute z-10 w-full mt-2 bg-white rounded-lg border-2 border-black shadow-lg">
                         {sportsData[selectedSport].leagues.map((league) => (
                           <div
                             key={league}
-                            className="px-4 py-3 hover:bg-[#1a1a1a] cursor-pointer transition-colors text-white"
+                            className="px-4 py-3 hover:bg-gray-100 cursor-pointer transition-colors text-[#0b1f3a] border-b border-gray-200 last:border-b-0"
                             onClick={() => {
                               setSelectedLeague(league);
                               setSelectedTeam("");
@@ -649,9 +651,9 @@ export default function Propose() {
 
                   {/* Team Selection (always show, but disabled if no league) */}
                   <div className="relative">
-                    <div className="text-[#838587] text-lg mb-2">Select Team</div>
+                    <div className="text-[#0b1f3a] text-sm font-bold mb-2">Select Team</div>
                     <button 
-                      className={`w-full text-[#838587] px-4 py-3.5 text-lg font-medium bg-[#111111] rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] flex justify-between items-center transition-colors ${!selectedLeague ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#1a1a1a] cursor-pointer'}`}
+                      className={`w-full text-[#0b1f3a] px-4 py-3 text-lg font-medium bg-white rounded-lg border-2 border-black flex justify-between items-center transition-colors ${!selectedLeague ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50 cursor-pointer'}`}
                       onClick={() => selectedLeague && setTeamOpen(!teamOpen)}
                       disabled={!selectedLeague}
                     >
@@ -661,11 +663,11 @@ export default function Propose() {
                       </svg>
                     </button>
                     {teamOpen && selectedLeague && (
-                      <div className="absolute z-10 w-full mt-2 bg-[#111111] rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] shadow-lg">
+                      <div className="absolute z-10 w-full mt-2 bg-white rounded-lg border-2 border-black shadow-lg">
                         {sportsData[selectedSport].teams[selectedLeague].map((team) => (
                           <div
                             key={team}
-                            className="px-4 py-3 hover:bg-[#1a1a1a] cursor-pointer transition-colors text-white"
+                            className="px-4 py-3 hover:bg-gray-100 cursor-pointer transition-colors text-[#0b1f3a] border-b border-gray-200 last:border-b-0"
                             onClick={() => {
                               setSelectedTeam(team);
                               setSelectedStatType("");
@@ -684,13 +686,13 @@ export default function Propose() {
                 <div className="flex flex-col gap-6">
                   {/* Stat Type Selection (always show, but disabled if no team) */}
                   <div className="flex flex-col gap-2">
-                    <div className="text-[#838587] text-lg">Prediction Type</div>
+                    <div className="text-[#0b1f3a] text-sm font-bold">Prediction Type</div>
                     <div className="flex gap-4">
                       <button
-                        className={`flex-1 px-4 py-3.5 text-lg font-medium rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] transition-colors ${
+                        className={`flex-1 px-4 py-3 text-lg font-extrabold rounded-lg border-4 transition-all ${
                           selectedStatType === "points"
-                            ? "bg-[#07b3ff] text-[#111111]"
-                            : !selectedTeam ? 'opacity-50 cursor-not-allowed' : 'bg-[#111111] text-[#838587] hover:bg-[#1a1a1a] cursor-pointer'
+                            ? "bg-[#0b1f3a] text-white border-white"
+                            : !selectedTeam ? 'opacity-50 cursor-not-allowed bg-white border-black text-[#0b1f3a]' : 'bg-white border-black text-[#0b1f3a] hover:bg-[#0b1f3a] hover:text-white hover:border-white cursor-pointer'
                         }`}
                         onClick={() => selectedTeam && setSelectedStatType("points")}
                         disabled={!selectedTeam}
@@ -698,10 +700,10 @@ export default function Propose() {
                         Points
                       </button>
                       <button
-                        className={`flex-1 px-4 py-3.5 text-lg font-medium rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] transition-colors ${
+                        className={`flex-1 px-4 py-3 text-lg font-extrabold rounded-lg border-4 transition-all ${
                           selectedStatType === "next_game"
-                            ? "bg-[#07b3ff] text-[#111111]"
-                            : !selectedTeam ? 'opacity-50 cursor-not-allowed' : 'bg-[#111111] text-[#838587] hover:bg-[#1a1a1a] cursor-pointer'
+                            ? "bg-[#0b1f3a] text-white border-white"
+                            : !selectedTeam ? 'opacity-50 cursor-not-allowed bg-white border-black text-[#0b1f3a]' : 'bg-white border-black text-[#0b1f3a] hover:bg-[#0b1f3a] hover:text-white hover:border-white cursor-pointer'
                         }`}
                         onClick={() => selectedTeam && setSelectedStatType("next_game")}
                         disabled={!selectedTeam}
@@ -713,13 +715,13 @@ export default function Propose() {
 
                   {/* Win/Lose Selection (always show, but disabled if not next_game) */}
                   <div className="flex flex-col gap-2">
-                    <div className="text-[#838587] text-lg">Prediction</div>
+                    <div className="text-[#0b1f3a] text-sm font-bold">Prediction</div>
                     <div className="flex gap-4">
                       <button
-                        className={`flex-1 px-4 py-3.5 text-lg font-medium rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] transition-colors ${
+                        className={`flex-1 px-4 py-3 text-lg font-extrabold rounded-lg border-4 transition-all ${
                           predictionOutcome === "win"
-                            ? "bg-[#07b3ff] text-[#111111]"
-                            : selectedStatType !== "next_game" ? 'opacity-50 cursor-not-allowed' : 'bg-[#111111] text-[#838587] hover:bg-[#1a1a1a] cursor-pointer'
+                            ? "bg-[#0b1f3a] text-white border-white"
+                            : selectedStatType !== "next_game" ? 'opacity-50 cursor-not-allowed bg-white border-black text-[#0b1f3a]' : 'bg-white border-black text-[#0b1f3a] hover:bg-[#0b1f3a] hover:text-white hover:border-white cursor-pointer'
                         }`}
                         onClick={() => selectedStatType === "next_game" && setPredictionOutcome("win")}
                         disabled={selectedStatType !== "next_game"}
@@ -727,10 +729,10 @@ export default function Propose() {
                         Win
                       </button>
                       <button
-                        className={`flex-1 px-4 py-3.5 text-lg font-medium rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] transition-colors ${
+                        className={`flex-1 px-4 py-3 text-lg font-extrabold rounded-lg border-4 transition-all ${
                           predictionOutcome === "lose"
-                            ? "bg-[#07b3ff] text-[#111111]"
-                            : selectedStatType !== "next_game" ? 'opacity-50 cursor-not-allowed' : 'bg-[#111111] text-[#838587] hover:bg-[#1a1a1a] cursor-pointer'
+                            ? "bg-[#0b1f3a] text-white border-white"
+                            : selectedStatType !== "next_game" ? 'opacity-50 cursor-not-allowed bg-white border-black text-[#0b1f3a]' : 'bg-white border-black text-[#0b1f3a] hover:bg-[#0b1f3a] hover:text-white hover:border-white cursor-pointer'
                         }`}
                         onClick={() => selectedStatType === "next_game" && setPredictionOutcome("lose")}
                         disabled={selectedStatType !== "next_game"}
@@ -742,10 +744,10 @@ export default function Propose() {
 
                   {/* Target Value for points (always show, but disabled if not points) */}
                   <div className="flex flex-col gap-2">
-                    <div className="text-[#838587] text-lg">Target Points</div>
+                    <div className="text-[#0b1f3a] text-sm font-bold">Target Points</div>
                     <input
                       type="number"
-                      className={`w-full px-4 py-3.5 text-[#838587] text-lg font-medium bg-[#111111] rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] hover:bg-[#1a1a1a] transition-colors ${selectedStatType !== "points" ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      className={`w-full px-4 py-3 text-[#0b1f3a] text-lg font-medium bg-white rounded-lg border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#0b1f3a] transition-all ${selectedStatType !== "points" ? 'opacity-50 cursor-not-allowed' : ''}`}
                       placeholder="Enter target points"
                       name="value"
                       onChange={onInputChange}
@@ -758,17 +760,48 @@ export default function Propose() {
               </div>
             )}
 
+            {/* Custom Question Input for Custom Market */}
+            {marketField[marketFieldIndex].name === "Custom Market" && (
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2">
+                  <div className="text-[#0b1f3a] text-sm font-bold">Your Prediction Question</div>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-3 text-[#0b1f3a] text-lg font-medium bg-white rounded-lg border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#0b1f3a] transition-all"
+                    placeholder="e.g., Will it rain tomorrow?"
+                    name="description"
+                    onChange={onInputChange}
+                    value={data.description}
+                  />
+                  <div className="text-[#0b1f3a]/60 text-xs">Enter your custom prediction market question</div>
+                </div>
+
+                <div className="flex flex-row gap-4">
+                  <div className="flex-1 flex flex-col gap-2">
+                    <div className="text-[#0b1f3a] text-sm font-bold">Resolution Date</div>
+                    <input
+                      type="date"
+                      className="w-full px-4 py-3 text-[#0b1f3a] text-lg font-medium bg-white rounded-lg border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#0b1f3a] transition-all"
+                      name="date"
+                      onChange={onInputChange}
+                    />
+                    <div className={`text-red ${error.date !== "" ? "" : "invisible"}`}>*Invalid Resolution Date</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Input Fields Grid */}
-            {marketField[marketFieldIndex].name !== "Sports Prediction Market" && (
+            {marketField[marketFieldIndex].name !== "Sports Prediction Market" && marketField[marketFieldIndex].name !== "Custom Market" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Token Ticker - Only show for coin markets */}
                 <div className="flex flex-col gap-6">
                   <div className="flex flex-col gap-2">
-                    <div className="text-[#838587] text-lg font-semibold">Token Ticker</div>
+                    <div className="text-[#0b1f3a] text-sm font-bold">Token Ticker</div>
                     <div className="relative">
                       <input
                         type="text"
-                        className="w-full px-4 py-3.5 text-[#838587] text-lg font-medium bg-[#181a1b] rounded-2xl border border-[#232a32] focus:border-[#07b3ff] outline-none transition-all"
+                        className="w-full px-4 py-3 text-[#0b1f3a] text-lg font-medium bg-white rounded-lg border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#0b1f3a] transition-all"
                         placeholder={`${marketField[marketFieldIndex].content[marketFieldContentIndex].api_name === "Coingecho"? `Search for a token (e.g. BTC, ETH, etc.)`: `2bvTCZrV2wm5sDj2KENEbERzAXo3w499cVB9wDbXbonk`}`}
                         value={tokenSearch}
                         id={marketField[marketFieldIndex].content[marketFieldContentIndex].needed_data[0].name}
@@ -776,7 +809,7 @@ export default function Propose() {
                         // onFocus={() => setTokenDropdownOpen(true)}
                       />
                       {tokenDropdownOpen && (
-                        <div className="absolute z-10 w-full mt-2 max-h-60 overflow-y-auto bg-[#181a1b] rounded-2xl border border-[#232a32] shadow-lg">
+                        <div className="absolute z-10 w-full mt-2 max-h-60 overflow-y-auto bg-white rounded-lg border-2 border-black shadow-lg">
                           {tokenList
                             .filter(token =>
                               token.symbol.toLowerCase().includes(tokenSearch.toLowerCase()) ||
@@ -786,7 +819,7 @@ export default function Propose() {
                             .map(token => (
                               <div
                                 key={token.id}
-                                className="px-4 py-3 hover:bg-[#232a32] cursor-pointer text-white"
+                                className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-[#0b1f3a] border-b border-gray-200 last:border-b-0"
                                 onClick={() => {
                                   setSelectedToken(token);
                                   setTokenSearch(token.symbol.toUpperCase());
@@ -794,14 +827,14 @@ export default function Propose() {
                                   setData(prev => ({ ...prev, feedName: token.symbol.toUpperCase() }));
                                 }}
                               >
-                                <span className="font-bold">{token.symbol.toUpperCase()}</span> <span className="text-[#838587]">{token.name}</span>
+                                <span className="font-bold">{token.symbol.toUpperCase()}</span> <span className="text-[#0b1f3a]/70">{token.name}</span>
                               </div>
                             ))}
                           {tokenList.filter(token =>
                             token.symbol.toLowerCase().includes(tokenSearch.toLowerCase()) ||
                             token.name.toLowerCase().includes(tokenSearch.toLowerCase())
                           ).length === 0 && (
-                            <div className="px-4 py-3 text-[#838587]">No tokens found</div>
+                            <div className="px-4 py-3 text-[#0b1f3a]/70">No tokens found</div>
                           )}
                         </div>
                       )}
@@ -815,19 +848,19 @@ export default function Propose() {
                         href={`https://www.coingecko.com/en/coins/${selectedToken.id}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#07b3ff] underline text-base font-medium hover:text-[#3fd145] transition-colors float-left"
+                        className="text-[#0b1f3a] underline text-base font-bold hover:text-[#174a8c] transition-colors float-left"
                       >
                         View on CoinGecko
                       </Link>
-                      <div className="text-[#838587] text-xs">CoinGecko ID: <span className="font-mono">{selectedToken.id}</span></div>
+                      <div className="text-[#0b1f3a]/70 text-xs">CoinGecko ID: <span className="font-mono">{selectedToken.id}</span></div>
                     </div>
                   )}
                   {market.length > 0 &&
                     ( 
                       <div className="flex flex-col gap-4 relative">
-                        <div className="text-white text-xl font-medium">Choose DEX platform</div>
+                        <div className="text-[#0b1f3a] text-xl font-bold">Choose DEX platform</div>
                         <button 
-                          className="w-full text-[#838587] px-4 py-3.5 text-lg font-medium bg-[#181a1b] rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] flex justify-between items-center hover:bg-[#1a1a1a] transition-colors" 
+                          className="w-full text-[#0b1f3a] px-4 py-3 text-lg font-medium bg-white rounded-lg border-2 border-black flex justify-between items-center hover:bg-gray-50 transition-colors" 
                           onClick={() => setSelectDex(!selectDex)}
                         >
                           {market[dexIndex]}
@@ -836,11 +869,11 @@ export default function Propose() {
                           </svg>
                         </button>
                         {selectDex && (
-                          <div id="market_catagory" className="w-full bg-[#111111] rounded-2xl outline-1 outline-offset-[-1px] absolute left-0 bottom-[-100px] z-10 outline-[#313131]">
+                          <div id="market_catagory" className="w-full bg-white rounded-lg border-2 border-black absolute left-0 bottom-[-100px] z-10 shadow-lg">
                             {market.map((dex, index) => (
                               <div
                                 key={"market-field-" + index }
-                                className="px-4 py-3 hover:bg-[#1a1a1a] cursor-pointer transition-colors text-white"
+                                className="px-4 py-3 hover:bg-gray-100 cursor-pointer transition-colors text-[#0b1f3a] border-b border-gray-200 last:border-b-0"
                                 onClick={() => {
                                   setSelectDex(false);
                                   setDexIndex(index);
@@ -862,10 +895,10 @@ export default function Propose() {
                 <div className="flex flex-col gap-6">
                   <div className="flex flex-row gap-4">
                     <div className="flex-1 flex flex-col gap-2">
-                      <div className="text-[#838587] text-lg font-semibold">Target Value</div>
+                      <div className="text-[#0b1f3a] text-sm font-bold">Target Value</div>
                       <input
                         type="number"
-                        className="w-full px-4 py-3.5 text-[#838587] text-lg font-medium bg-[#181a1b] rounded-2xl border border-[#232a32] focus:border-[#07b3ff] outline-none transition-all"
+                        className="w-full px-4 py-3 text-[#0b1f3a] text-lg font-medium bg-white rounded-lg border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#0b1f3a] transition-all"
                         placeholder="Enter target value"
                         name="value"
                         onChange={onInputChange}
@@ -875,10 +908,10 @@ export default function Propose() {
                       <div className={`text-red ${error.value !== "" ? "" : "invisible"}`}>*Invalid Prediction Value</div>
                     </div>
                     <div className="flex-1 flex flex-col gap-2">
-                      <div className="text-[#838587] text-lg font-semibold">Resolution Date</div>
+                      <div className="text-[#0b1f3a] text-sm font-bold">Resolution Date</div>
                       <input
                         type="date"
-                        className="w-full px-4 py-3.5 text-[#838587] text-lg font-medium bg-[#181a1b] rounded-2xl border border-[#232a32] focus:border-[#07b3ff] outline-none transition-all"
+                        className="w-full px-4 py-3 text-[#0b1f3a] text-lg font-medium bg-white rounded-lg border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#0b1f3a] transition-all"
                         name="date"
                         onChange={onInputChange}
                       />
@@ -887,23 +920,23 @@ export default function Propose() {
                   </div>
                   {/* Prediction Type Selection - Only show for coin markets */}
                   <div className="flex flex-col gap-2 mt-2">
-                    <div className="text-[#838587] text-lg font-semibold">Prediction Type</div>
+                    <div className="text-[#0b1f3a] text-sm font-bold">Prediction Type</div>
                     <div className="flex gap-4">
                       <button
-                        className={`flex-1 px-4 py-3.5 text-lg font-semibold rounded-2xl border border-[#232a32] transition-colors ${
+                        className={`flex-1 px-4 py-3 text-lg font-extrabold rounded-lg border-4 transition-all ${
                           data.range === 0
-                            ? "bg-[#07b3ff] text-[#181a1b] border-[#07b3ff] shadow"
-                            : "bg-[#181a1b] text-[#838587] hover:bg-[#232a32]"
+                            ? "bg-[#0b1f3a] text-white border-white"
+                            : "bg-white text-[#0b1f3a] border-black hover:bg-[#0b1f3a] hover:text-white hover:border-white"
                         }`}
                         onClick={() => setData(prev => ({ ...prev, range: 0 }))}
                       >
                         Price Target
                       </button> 
                       <button
-                        className={`flex-1 px-4 py-3.5 text-lg font-semibold rounded-2xl border border-[#232a32] transition-colors ${
+                        className={`flex-1 px-4 py-3 text-lg font-extrabold rounded-lg border-4 transition-all ${
                           data.range === 1
-                            ? "bg-[#07b3ff] text-[#181a1b] border-[#07b3ff] shadow"
-                            : "bg-[#181a1b] text-[#838587] hover:bg-[#232a32]"
+                            ? "bg-[#0b1f3a] text-white border-white"
+                            : "bg-white text-[#0b1f3a] border-black hover:bg-[#0b1f3a] hover:text-white hover:border-white"
                         }`}
                         onClick={() => setData(prev => ({ ...prev, range: 1 }))}
                       >
@@ -917,10 +950,10 @@ export default function Propose() {
 
             {/* Description - Full width below the grid */}
             <div className="flex flex-col gap-2 mt-6">
-              <div className="text-[#838587] text-lg font-semibold">Description</div>
+              <div className="text-[#0b1f3a] text-sm font-bold">Description</div>
               <textarea
                 rows={6}
-                className="w-full px-4 py-3.5 text-[#838587] text-lg font-medium bg-[#181a1b] rounded-2xl border border-[#232a32] focus:border-[#07b3ff] outline-none transition-all resize-none"
+                className="w-full px-4 py-3 text-[#0b1f3a] text-lg font-medium bg-white rounded-lg border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#0b1f3a] transition-all resize-none"
                 placeholder="Describe your prediction market..."
                 name="description"
                 onChange={onInputChange}
@@ -935,12 +968,12 @@ export default function Propose() {
                 <input
                   id="default-checkbox"
                   type="checkbox"
-                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500"
+                  className="w-5 h-5 text-black bg-white border-2 border-black rounded focus:ring-2 focus:ring-[#0b1f3a]"
                   onClick={handleCheckboxChange}
                 />
-                <div className="text-[#838587] text-lg">
+                <div className="text-[#0b1f3a] text-lg font-medium">
                   I agree to the{" "}
-                  <span className="text-[#3fd145] underline cursor-pointer">
+                  <span className="text-[#0b1f3a] font-bold underline cursor-pointer hover:text-[#174a8c]">
                     Terms & Conditions
                   </span>
                 </div>
@@ -951,7 +984,7 @@ export default function Propose() {
 
               {/* Submit Button */}
               <button
-                className="w-full px-6 py-4 text-xl font-medium text-[#111111] bg-[#07b3ff] rounded-2xl shadow-[inset_0px_3px_0px_0px_rgba(255,255,255,0.16)] hover:bg-[#0697e5] transition-all duration-200 ease-in-out transform hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full px-6 py-4 text-xl font-extrabold text-[#0b1f3a] bg-white rounded-xl border-4 border-black hover:bg-[#0b1f3a] hover:text-white hover:border-[#0b1f3a] hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 ease-in-out"
                 onClick={onSubmit}
               >
                 Create Market

@@ -1,9 +1,7 @@
 "use client";
 
-import FundCard from "@/components/elements/fund/FundCard";
 import Market from "@/components/elements/marketInfo/Market";
 import { useGlobalContext } from "@/providers/GlobalContext";
-import axios from "axios";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
@@ -18,19 +16,15 @@ export default function FundMarket() {
   }, [pathname, setActiveTab]); // Dependency array ensures it runs on pathname change
 
   return (
-    <div className="self-stretch sm:px-[40px] px-5 inline-flex flex-col justify-start items-start gap-[50px] overflow-auto">
-      {/* <MarketCarousel /> */}
-      <FundCard
-        title="Will Bitcoin hit 100K by April?"
-        description="This market will resolve to “Yes” if Bitcoin hits 100K by April. If not, it will resolve to “No”."
-        category="Cryptocurrency"
-        imageUrl="/fund.png"
-        votes={45}
-        progress={8} // Progress out of 30
-        solRaised="8.9 SOL"
-        expiresIn="7d : 6h : 21m : 46s"
-      />
-      <Market />
+    <div className="w-full sm:px-[42px] px-5 flex flex-col justify-start items-start gap-[50px] overflow-y-auto overflow-x-hidden">
+      <div className="w-full">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-[#0b1f3a]">Funding Markets</h2>
+        </div>
+      </div>
+      <div className="w-full">
+        <Market />
+      </div>
     </div>
   );
 }

@@ -189,12 +189,7 @@ export const pendingPredictions: PendingData[] = [
   },
 ];
 
-interface MarketProps {
-  showRecentActivity?: boolean;
-  onToggleRecentActivity?: () => void;
-}
-
-const Market: React.FC<MarketProps> = ({ showRecentActivity = true, onToggleRecentActivity }) => {
+const Market: React.FC = () => {
   const { markets, activeTab, formatMarketData } = useGlobalContext();
   const pathname = usePathname();
   const [currentPage, setCurrentPage] = useState(1);
@@ -213,9 +208,9 @@ const Market: React.FC<MarketProps> = ({ showRecentActivity = true, onToggleRece
         }
       };
       if (pathname === "/fund") {
-        marketData = await axios.get(`http://localhost:8080/api/market/get?page=${currentPage}&limit=10&marketStatus=PENDING&marketField=${selectedCategory === "Sports" ? 1 : 0}`);
+        marketData = await axios.get(`/api/market/get?page=${currentPage}&limit=10&marketStatus=PENDING&marketField=${selectedCategory === "Sports" ? 1 : 0}`);
       } else if (pathname === "/") {
-        marketData = await axios.get(`http://localhost:8080/api/market/get?page=${currentPage}&limit=10&marketStatus=ACTIVE&marketField=${selectedCategory === "Sports" ? 1 : 0}`);
+        marketData = await axios.get(`/api/market/get?page=${currentPage}&limit=10&marketStatus=ACTIVE&marketField=${selectedCategory === "Sports" ? 1 : 0}`);
       }
 
       setTotal(marketData.data.total);
@@ -247,41 +242,53 @@ const Market: React.FC<MarketProps> = ({ showRecentActivity = true, onToggleRece
   });
 
   return (
-    <div className="flex-1 inline-flex flex-col self-stretch justify-start items-start gap-6">
+    <div className="w-full flex flex-col justify-start items-start gap-6">
       <Navbar 
         categories={categories} 
-        onCategorySelect={handleCategorySelect} 
-        showRecentActivity={showRecentActivity}
-        onToggleRecentActivity={onToggleRecentActivity}
+        onCategorySelect={handleCategorySelect}
       />
-      <div className={`grid w-full gap-4 ${
-        pathname === "/fund" 
-          ? "2xl:grid-cols-3 xl:grid-cols-3 lg:grid-cols-2 sm:grid-cols-1" 
-          : showRecentActivity
-            ? "2xl:grid-cols-2 xl:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1"
+      {filteredMarkets.length === 0 ? (
+        <div className="w-full flex justify-center items-center p-12">
+          <div className="max-w-md p-8 bg-white rounded-2xl border-4 border-black text-center">
+            <div className="text-6xl mb-4">📊</div>
+            <h3 className="text-2xl font-extrabold text-[#0b1f3a] mb-2">
+              {activeTab === "ACTIVE" ? "No Active Markets" : "No Pending Markets"}
+            </h3>
+            <p className="text-[#0b1f3a] opacity-70">
+              {activeTab === "ACTIVE" 
+                ? "There are currently no active markets. Check back soon!" 
+                : "There are currently no markets awaiting funding. Check the active markets or create a new one!"}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className={`grid w-full gap-4 ${
+          pathname === "/fund" 
+            ? "2xl:grid-cols-3 xl:grid-cols-3 lg:grid-cols-2 sm:grid-cols-1" 
             : "2xl:grid-cols-3 xl:grid-cols-3 lg:grid-cols-2 sm:grid-cols-1"
-      }`}>
-        {filteredMarkets.map((prediction, index) =>
-          activeTab === "ACTIVE" ? (
-            <PredictionCard
-              key={prediction._id}
-              index={markets.indexOf(prediction)}
-              currentPage={currentPage}
-            />
-          ) : (
-            <PendingCard
-              key={prediction._id}
-              index={markets.indexOf(prediction)}
-              category={prediction.feedName}
-              question={prediction.question}
-              volume={prediction.totalInvestment}
-              timeLeft={prediction.date}
-              comments={0}
-              imageUrl={prediction.imageUrl}
-            />
-          )
-        )}
-      </div>
+        }`}>
+          {filteredMarkets.map((prediction, index) =>
+            activeTab === "ACTIVE" ? (
+              <PredictionCard
+                key={prediction._id}
+                index={markets.indexOf(prediction)}
+                currentPage={currentPage}
+              />
+            ) : (
+              <PendingCard
+                key={prediction._id}
+                index={markets.indexOf(prediction)}
+                category={prediction.feedName}
+                question={prediction.question}
+                volume={prediction.totalInvestment}
+                timeLeft={prediction.date}
+                comments={0}
+                imageUrl={prediction.imageUrl}
+              />
+            )
+          )}
+        </div>
+      )}
 
       {
         filteredMarkets.length <= 10 ? "" : <Pagination

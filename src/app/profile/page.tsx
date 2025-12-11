@@ -176,7 +176,7 @@ export default function Home() {
   }, [publicKey]); 
   return (
     <div className="self-stretch h-[1184px] px-[50px] flex-col lg:flex-row inline-flex justify-start items-start gap-[50px] overflow-auto">
-      <div className="lg:w-[680px] flex-col lg:flex-row p-6 bg-[#1e1e1e] rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] flex justify-start items-start gap-4">
+      <div className="lg:w-[680px] flex-col lg:flex-row p-6 bg-white rounded-2xl border-4 border-black shadow-lg flex justify-start items-start gap-4">
         {/* <img
           className="sm:w-[100px] sm:h-[100px] w-[50px] h-[50px] rounded-[10px] border border-white"
           src="https://placehold.co/100x100"
@@ -185,21 +185,21 @@ export default function Home() {
         <div className="flex-1 inline-flex flex-col justify-start items-start gap-4">
           <div className="self-stretch inline-flex justify-start items-start gap-4">
             <div className="flex-1 h-[100px] inline-flex flex-col justify-center items-start gap-1">
-              <div className="justify-start text-[#3fd145] text-[32px] font-medium font-satoshi leading-loose">
+              <div className="justify-start text-[#0b1f3a] text-[32px] font-extrabold font-satoshi leading-loose">
                 User One
               </div>
-              {/* <div className="self-stretch justify-start text-white text-xl font-medium font-satoshi leading-relaxed">
-                @speculapeuser
+              {/* <div className="self-stretch justify-start text-[#0b1f3a] text-xl font-medium font-satoshi leading-relaxed">
+                @minimarketuser
               </div> */}
             </div>
             <div className="flex-1 h-[100px] flex justify-end items-center gap-1">
-              <div className="px-3 py-1 rounded-[100px] outline-1 outline-offset-[-1px] outline-[#313131] flex justify-start items-center gap-1">
+              <div className="px-3 py-1 rounded-[100px] border-2 border-black flex justify-start items-center gap-1">
                 <div className="w-6 h-6 relative overflow-hidden">
                   <div className="w-[5.50px] h-[1.50px] left-[5px] top-[7px] absolute bg-[#838587]" />
                   <div className="w-[9px] h-2 left-[14px] top-[8px] absolute bg-[#838587]" />
                   <div className="w-[19.14px] h-[17.50px] left-[2px] top-[3px] absolute opacity-50 bg-[#838587]" />
                 </div>
-                <div className="justify-start text-[#07b3ff] text-xl font-medium font-satoshi leading-relaxed">
+                <div className="justify-start text-[#0b1f3a] text-xl font-bold font-satoshi leading-relaxed">
                   {publicKey?.toBase58() ?elipsKey(publicKey?.toBase58()):""}
                 </div>
               </div>
@@ -208,69 +208,69 @@ export default function Home() {
           <div className="self-stretch inline-flex justify-start items-start gap-4">
             <div className="flex-1 inline-flex flex-col justify-start items-start gap-4">
               <div className="flex flex-col justify-start items-start gap-1">
-                <div className="self-stretch justify-start text-[#838587] text-lg font-medium font-satoshi leading-relaxed">
+                <div className="self-stretch justify-start text-[#0b1f3a]/70 text-lg font-bold font-satoshi leading-relaxed">
                   {" "}
                   Total Portfolio Value
                 </div>
-                <div className="self-stretch justify-start text-white text-xl font-medium font-satoshi leading-relaxed">
+                <div className="self-stretch justify-start text-[#0b1f3a] text-xl font-extrabold font-satoshi leading-relaxed">
                   {profileData?parseFloat(Number(profileData.earnedFeeLiquidity / 1000000000 + profileData.totalLiquidityProvided).toFixed(9)).toString(): 0}
                 </div>
               </div>
               <div className="flex flex-col justify-start items-start gap-1">
-                <div className="self-stretch justify-start text-[#838587] text-lg font-medium font-satoshi leading-relaxed">
+                <div className="self-stretch justify-start text-[#0b1f3a]/70 text-lg font-bold font-satoshi leading-relaxed">
                   Active Bet
                 </div>
-                <div className="self-stretch justify-start text-white text-xl font-medium font-satoshi leading-relaxed">
+                <div className="self-stretch justify-start text-[#0b1f3a] text-xl font-extrabold font-satoshi leading-relaxed">
                   {profileData? profileData.activeBet : 0}
                 </div>
               </div>
               <div className="flex flex-col justify-start items-start gap-1">
-                <div className="self-stretch justify-start text-[#838587] text-lg font-medium font-satoshi leading-relaxed">
+                <div className="self-stretch justify-start text-[#0b1f3a]/70 text-lg font-bold font-satoshi leading-relaxed">
                   Total Bet
                 </div>
-                <div className="self-stretch justify-start text-white text-xl font-medium font-satoshi leading-relaxed">
+                <div className="self-stretch justify-start text-[#0b1f3a] text-xl font-extrabold font-satoshi leading-relaxed">
                   {profileData? profileData.totalBet : 0}
                 </div>
               </div>
               <div className="flex flex-col justify-start items-start gap-1">
-                <div className="self-stretch justify-start text-[#838587] text-lg font-medium font-satoshi leading-relaxed">
+                <div className="self-stretch justify-start text-[#0b1f3a]/70 text-lg font-bold font-satoshi leading-relaxed">
                   Total Liquidity Provided
                 </div>
-                <div className="self-stretch justify-start text-white text-xl font-medium font-satoshi leading-relaxed">
+                <div className="self-stretch justify-start text-[#0b1f3a] text-xl font-extrabold font-satoshi leading-relaxed">
                   {profileData? parseFloat(Number(profileData.totalLiquidityProvided).toFixed(9)).toString() : 0} SOL
                 </div>
               </div>
             </div>
             <div className="flex-1 inline-flex flex-col justify-start items-start gap-4">
               <div className="flex flex-col justify-start items-start gap-1">
-                <div className="self-stretch justify-start text-[#838587] text-lg font-medium font-satoshi leading-relaxed">
+                <div className="self-stretch justify-start text-[#0b1f3a]/70 text-lg font-bold font-satoshi leading-relaxed">
                   Fees Earned From Liquidity
                 </div>
-                <div className="self-stretch justify-start text-white text-xl font-medium font-satoshi leading-relaxed">
+                <div className="self-stretch justify-start text-[#0b1f3a] text-xl font-extrabold font-satoshi leading-relaxed">
                   {profileData? parseFloat(Number(profileData.earnedFeeLiquidity / 1000000000).toFixed(9)).toString() : 0} SOL
                 </div>
               </div>
               <div className="flex flex-col justify-start items-start gap-1">
-                <div className="self-stretch justify-start text-[#838587] text-lg font-medium font-satoshi leading-relaxed">
+                <div className="self-stretch justify-start text-[#0b1f3a]/70 text-lg font-bold font-satoshi leading-relaxed">
                   Earning From Bet
                 </div>
-                <div className="self-stretch justify-start text-white text-xl font-medium font-satoshi leading-relaxed">
+                <div className="self-stretch justify-start text-[#0b1f3a] text-xl font-extrabold font-satoshi leading-relaxed">
                   ${profileData? profileData.earnedBet : 0}
                 </div>
               </div>
               <div className="flex flex-col justify-start items-start gap-1">
-                <div className="self-stretch justify-start text-[#838587] text-lg font-medium font-satoshi leading-relaxed">
+                <div className="self-stretch justify-start text-[#0b1f3a]/70 text-lg font-bold font-satoshi leading-relaxed">
                   Proposed Market
                 </div>
-                <div className="self-stretch justify-start text-white text-xl font-medium font-satoshi leading-relaxed">
+                <div className="self-stretch justify-start text-[#0b1f3a] text-xl font-extrabold font-satoshi leading-relaxed">
                   {profileData? profileData.totalProposedMarket : 0}
                 </div>
               </div>
               <div className="flex flex-col justify-start items-start gap-1">
-                <div className="self-stretch justify-start text-[#838587] text-lg font-medium font-satoshi leading-relaxed">
+                <div className="self-stretch justify-start text-[#0b1f3a]/70 text-lg font-bold font-satoshi leading-relaxed">
                   Total Referrals
                 </div>
-                <div className="self-stretch justify-start text-white text-xl font-medium font-satoshi leading-relaxed">
+                <div className="self-stretch justify-start text-[#0b1f3a] text-xl font-extrabold font-satoshi leading-relaxed">
                   {profileData? profileData.totalreferrals : 0}
                 </div>
               </div>
@@ -284,23 +284,23 @@ export default function Home() {
 
         {activeTab === "Betting History" && (
           <>
-            <div className="self-stretch justify-start text-white text-[28px] font-medium font-['Rubik'] leading-[48px]">
+            <div className="self-stretch justify-start text-[#0b1f3a] text-[28px] font-extrabold font-['Rubik'] leading-[48px]">
               All Betting History
             </div>
-            <div className="self-stretch px-4 py-2 bg-[#1e1e1e] rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] inline-flex justify-start items-center gap-3">
-              <div className="w-8 opacity-0 text-right justify-center text-[#838587] text-base font-medium font-satoshi leading-none">
+            <div className="self-stretch px-4 py-2 bg-white rounded-2xl border-2 border-black inline-flex justify-start items-center gap-3">
+              <div className="w-8 opacity-0 text-right justify-center text-[#0b1f3a]/70 text-base font-bold font-satoshi leading-none">
                 St
               </div>
-              <div className="flex-1 justify-center text-[#838587] text-base font-medium font-satoshi leading-none">
+              <div className="flex-1 justify-center text-[#0b1f3a]/70 text-base font-bold font-satoshi leading-none">
                 Name
               </div>
-              <div className="w-[100px] justify-center text-[#838587] text-base font-medium font-satoshi leading-none">
+              <div className="w-[100px] justify-center text-[#0b1f3a]/70 text-base font-bold font-satoshi leading-none">
                 Status
               </div>
-              <div className="w-[100px] justify-center text-[#838587] text-base font-medium font-satoshi leading-none">
+              <div className="w-[100px] justify-center text-[#0b1f3a]/70 text-base font-bold font-satoshi leading-none">
                 Odds
               </div>
-              <div className="w-[100px] justify-center text-[#838587] text-base font-medium font-satoshi leading-none">
+              <div className="w-[100px] justify-center text-[#0b1f3a]/70 text-base font-bold font-satoshi leading-none">
                 Bet Amount
               </div>
             </div>
@@ -312,23 +312,23 @@ export default function Home() {
 
         {activeTab === "Funded Market" && (
           <>
-            <div className="self-stretch justify-start text-white text-[28px] font-medium font-['Rubik'] leading-[48px]">
+            <div className="self-stretch justify-start text-[#0b1f3a] text-[28px] font-extrabold font-['Rubik'] leading-[48px]">
               All Funded Market
             </div>
-            <div className="self-stretch px-4 py-2 bg-[#1e1e1e] rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] inline-flex justify-start items-center gap-3">
-              <div className="w-8 opacity-0 text-right justify-center text-[#838587] text-base font-medium font-satoshi leading-none">
+            <div className="self-stretch px-4 py-2 bg-white rounded-2xl border-2 border-black inline-flex justify-start items-center gap-3">
+              <div className="w-8 opacity-0 text-right justify-center text-[#0b1f3a]/70 text-base font-bold font-satoshi leading-none">
                 St
               </div>
-              <div className="flex-1 justify-center text-[#838587] text-base font-medium font-satoshi leading-none">
+              <div className="flex-1 justify-center text-[#0b1f3a]/70 text-base font-bold font-satoshi leading-none">
                 Name
               </div>
-              <div className="w-[100px] justify-center text-[#838587] text-base font-medium font-satoshi leading-none">
+              <div className="w-[100px] justify-center text-[#0b1f3a]/70 text-base font-bold font-satoshi leading-none">
                 Status
               </div>
-              <div className="w-[100px] justify-center text-[#838587] text-base font-medium font-satoshi leading-none">
+              <div className="w-[100px] justify-center text-[#0b1f3a]/70 text-base font-bold font-satoshi leading-none">
                 Percentage
               </div>
-              <div className="w-[100px] justify-center text-[#838587] text-base font-medium font-satoshi leading-none">
+              <div className="w-[100px] justify-center text-[#0b1f3a]/70 text-base font-bold font-satoshi leading-none">
                 Ext. Payment
               </div>
             </div>
@@ -340,23 +340,23 @@ export default function Home() {
 
         {activeTab === "Proposed Market" && (
           <>
-            <div className="self-stretch justify-start text-white text-[28px] font-medium font-['Rubik'] leading-[48px]">
+            <div className="self-stretch justify-start text-[#0b1f3a] text-[28px] font-extrabold font-['Rubik'] leading-[48px]">
               All Proposed Market
             </div>
-            <div className="self-stretch px-4 py-2 bg-[#1e1e1e] rounded-2xl outline-1 outline-offset-[-1px] outline-[#313131] inline-flex justify-start items-center gap-3">
-              <div className="w-8 opacity-0 text-right justify-center text-[#838587] text-base font-medium font-satoshi leading-none">
+            <div className="self-stretch px-4 py-2 bg-white rounded-2xl border-2 border-black inline-flex justify-start items-center gap-3">
+              <div className="w-8 opacity-0 text-right justify-center text-[#0b1f3a]/70 text-base font-bold font-satoshi leading-none">
                 St
               </div>
-              <div className="flex-1 justify-center text-[#838587] text-base font-medium font-satoshi leading-none">
+              <div className="flex-1 justify-center text-[#0b1f3a]/70 text-base font-bold font-satoshi leading-none">
                 Name
               </div>
-              <div className="w-[100px] justify-center text-[#838587] text-base font-medium font-satoshi leading-none">
+              <div className="w-[100px] justify-center text-[#0b1f3a]/70 text-base font-bold font-satoshi leading-none">
                 Status
               </div>
-              <div className="w-[100px] justify-center text-[#838587] text-base font-medium font-satoshi leading-none">
+              <div className="w-[100px] justify-center text-[#0b1f3a]/70 text-base font-bold font-satoshi leading-none">
                 Exp. in
               </div>
-              <div className="w-[100px] justify-center text-[#838587] text-base font-medium font-satoshi leading-none">
+              <div className="w-[100px] justify-center text-[#0b1f3a]/70 text-base font-bold font-satoshi leading-none">
                 Initial Liquidity
               </div>
             </div>

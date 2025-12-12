@@ -20,8 +20,8 @@ import { GlobalSettingType, CreateMarketType, DepositeLiquidityType, BetType, Or
 import { SystemProgram, Transaction, VersionedTransaction } from "@solana/web3.js";
 import { getAssociatedTokenAccount, getOrCreateATAInstruction } from "./util";
 import { marketConfig } from "@/data/data";
-import idl  from "./idl/prediction.json";
 import { BN } from 'bn.js';
+import idl from "./idl/prediction.json";
 
 let solConnection = new Connection("https://api.devnet.solana.com", {
   commitment: "confirmed",
@@ -34,27 +34,61 @@ let globalPDA: PublicKey = PublicKey.findProgramAddressSync(
 
 // Lazy initialization of program to avoid module-level IDL parsing issues
 let _program: anchor.Program | null = null;
-function getProgram(): anchor.Program {
-  if (!_program) {
-    _program = new anchor.Program(idl as any, PREDICTION_ID, { connection: solConnection });
+
+async function getProgram(): Promise<anchor.Program> {
+  if (_program) {
+    return _program;
   }
-  return _program;
+  
+  try {
+    // Use AnchorProvider with a dummy wallet for IDL-only operations
+    const provider = new anchor.AnchorProvider(
+      solConnection,
+      {} as any, // Dummy wallet
+      { commitment: "confirmed" }
+    );
+    
+    // Cast IDL to any to bypass strict type checking during initialization
+    // Must pass programId explicitly as the second parameter
+    _program = new anchor.Program(idl as any, PREDICTION_ID, provider);
+    return _program;
+  } catch (error) {
+    console.error("Error initializing Anchor program:", error);
+    throw new Error(`Failed to initialize program: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
+// Updated: 2025-12-12 - Fixed wallet publicKey caching issue
 export const createMarket = async (param: CreateMarketType) => {
   
-  if (!param.wallet.publicKey || !param.wallet.signTransaction || !param.wallet) {
-    return
+  if (!param.wallet || !param.wallet.publicKey || !param.wallet.signTransaction || !param.anchorWallet) {
+    console.error("❌ Wallet not connected properly");
+    throw new Error("Wallet must be connected with publicKey and signTransaction capabilities");
   }
+  
+  // Validate feed parameter
+  if (!param.feed || !param.feed.publicKey) {
+    console.error("❌ Feed oracle not provided");
+    throw new Error("Feed oracle with publicKey is required for market creation");
+  }
+  
+  // Cache the publicKey immediately to prevent undefined issues
+  const creator = await param.wallet.publicKey;
+  
+  if (!creator) {
+    console.error("❌ Creator publicKey is null after assignment");
+    throw new Error("Wallet publicKey is required");
+  }
+  
+  console.log("✅ Wallet connected. Creator:", creator.toBase58());
   
   let provider: anchor.Provider = new anchor.AnchorProvider(solConnection, param.anchorWallet, {
     skipPreflight: true,
     commitment: "confirmed",
   });
-  console.log("here start");
 
-  const creator = param.wallet.publicKey;
-  console.log("creator:", param.wallet.publicKey.toBase58());
+  // Load program with the actual provider
+  const program = new anchor.Program(idl as any, PREDICTION_ID, provider);
   
   let market = PublicKey.findProgramAddressSync(
     [Buffer.from(MARKET_SEED), Buffer.from(param.marketID)],
@@ -91,7 +125,7 @@ export const createMarket = async (param: CreateMarketType) => {
   )[0];
   let militime =  new Date(param.date as string).getTime();
   
-  const initTx = await getProgram().methods
+  const initTx = await program.methods
     .initMarket({
       value: param.value,
       marketId: param.marketID,
@@ -107,7 +141,7 @@ export const createMarket = async (param: CreateMarketType) => {
       date: new BN(militime/1000),
     })
     .accounts({
-      user: param.wallet.publicKey,
+      user: creator,
       feeAuthority: new PublicKey(feeAuthority),
       market,
       globalPda: globalPDA,
@@ -125,12 +159,12 @@ export const createMarket = async (param: CreateMarketType) => {
     .transaction();
   console.log("second transaction:");
 
-  const mintTx = await getProgram().methods
+  const mintTx = await program.methods
     .mintToken(param.marketID)
     .accounts({
       pdaTokenAAccount,
       pdaTokenBAccount,
-      user: param.wallet.publicKey,
+      user: creator,
       feeAuthority: new PublicKey(feeAuthority),
       market,
       global: globalPDA,
@@ -151,7 +185,7 @@ export const createMarket = async (param: CreateMarketType) => {
   );
 
   const creatTx = new Transaction({
-    feePayer: param.wallet.publicKey,
+    feePayer: creator,
     ...latestBlockHash,
   });
   creatTx.add(initTx).add(mintTx);
@@ -164,7 +198,7 @@ export const createMarket = async (param: CreateMarketType) => {
   });
   
   const messageV0 = new TransactionMessage({
-    payerKey: param.wallet.publicKey,
+    payerKey: creator,
     recentBlockhash: latestBlockHash.blockhash,
     instructions: creatTx.instructions,
   }).compileToV0Message();
@@ -206,14 +240,19 @@ export const createMarket = async (param: CreateMarketType) => {
 export const depositLiquidity = async (param: DepositeLiquidityType) => {
   console.log(param.amount, param.market_id, param.wallet.publicKey?.toBase58());
   
-  if ( !param.wallet || !param.wallet.publicKey || !param.wallet.signTransaction) {
+  if ( !param.wallet || !param.wallet.publicKey || !param.wallet.signTransaction || !param.anchorWallet) {
     return
   }
   
-  const investerPubkey = param.wallet.publicKey;
+  const investerPubkey = await param.wallet.publicKey;
   let market = new PublicKey(param.market_id)
 
-  let tx = await getProgram().methods.addLiquidity(new BN(param.amount * LAMPORTS_PER_SOL))
+  let provider = new anchor.AnchorProvider(solConnection, param.anchorWallet, {
+    skipPreflight: true,
+    commitment: "confirmed",
+  });
+  const program = new anchor.Program(idl as any, PREDICTION_ID, provider);
+  let tx = await program.methods.addLiquidity(new BN(param.amount * LAMPORTS_PER_SOL))
     .accounts({
       user: investerPubkey,
       feeAuthority: feeAuthority,
@@ -266,7 +305,15 @@ export const marketBetting = async (param: BetType) => {
   let pdaTokenAccount = await getAssociatedTokenAccount(market, tokenPubkey);
   let [playerTokenAccount, player_ata_instruction] = await getOrCreateATAInstruction(tokenPubkey, playerPubkey, solConnection );
 
-  const tx = await getProgram().methods.createBet({
+  if (!param.anchorWallet) {
+    throw new Error("Anchor wallet is required");
+  }
+  let provider = new anchor.AnchorProvider(solConnection, param.anchorWallet, {
+    skipPreflight: true,
+    commitment: "confirmed",
+  });
+  const program = new anchor.Program(idl as any, PREDICTION_ID, provider);
+  const tx = await program.methods.createBet({
     marketId: param.marketId,
     amount: new BN(param.amount),
     isYes: param.isYes,
@@ -321,7 +368,7 @@ export const marketBetting = async (param: BetType) => {
   const vTxSig = await solConnection.confirmTransaction(createV0Tx, 'finalized');
   console.log("🤖confirmation🤖", vTxSig);
 
-  const info = await getProgram().account.market.fetch(market, "confirmed");
+  const info = await program.account.market.fetch(market, "confirmed");
   //@ts-ignore
   console.log("token a amount:", Number(info.tokenAAmount));
   //@ts-ignore
@@ -376,7 +423,9 @@ function sleep(ms: number): Promise<void> {
 
 export const fetchMarketInfo = async (pda: PublicKey) => {
   try {
-    const info = await getProgram().account.market.fetch(pda, "confirmed");
+    // For read-only operations, we can use the lazy-initialized program
+    const program = await getProgram();
+    const info = await program.account.market.fetch(pda, "confirmed");
     console.log("market status:", info.marketStatus);
     
     return Object.keys(info.marketStatus as object)[0]

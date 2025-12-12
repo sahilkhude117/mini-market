@@ -22,12 +22,20 @@ export async function POST(request: NextRequest) {
       description,
     } = body.data;
 
-    console.log('🎯 Creating market:', { question, creator });
+    console.log('🎯 Creating market:', { question, creator, task });
+
+    // Ensure task is provided
+    if (!task || task.trim() === '') {
+      return NextResponse.json(
+        { error: 'Task field is required for market creation' },
+        { status: 400 }
+      );
+    }
 
     const marketData = new Market({
       marketField,
       apiType,
-      task,
+      task: task || 'default',
       creator,
       question,
       value,

@@ -189,12 +189,22 @@ export const pendingPredictions: PendingData[] = [
   },
 ];
 
-const Market: React.FC = () => {
+interface MarketProps {
+  showPendingOnHome?: boolean;
+}
+
+const Market: React.FC<MarketProps> = ({ showPendingOnHome = false }) => {
   const { markets, activeTab, formatMarketData } = useGlobalContext();
   const pathname = usePathname();
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string>("Trending");
   const [total, setTotal] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Force refresh when pathname changes
+  useEffect(() => {
+    setRefreshKey(prev => prev + 1);
+  }, [pathname]);
 
   useEffect(() => {
     (async () => {
@@ -208,15 +218,20 @@ const Market: React.FC = () => {
         }
       };
       if (pathname === "/fund") {
-        marketData = await axios.get(`/api/market/get?page=${currentPage}&limit=10&marketStatus=PENDING&marketField=${selectedCategory === "Sports" ? 1 : 0}`);
+        // Don't filter by marketField for fund page - show all pending markets
+        marketData = await axios.get(`/api/market/get?page=${currentPage}&limit=10&marketStatus=PENDING&t=${Date.now()}`);
       } else if (pathname === "/") {
-        marketData = await axios.get(`/api/market/get?page=${currentPage}&limit=10&marketStatus=ACTIVE&marketField=${selectedCategory === "Sports" ? 1 : 0}`);
+        // Home page - show active or pending based on toggle
+        const status = showPendingOnHome ? "PENDING" : "ACTIVE";
+        marketData = await axios.get(`/api/market/get?page=${currentPage}&limit=10&marketStatus=${status}&t=${Date.now()}`);
       }
 
-      setTotal(marketData.data.total);
-      formatMarketData(marketData.data.data);
+      if (marketData.data) {
+        setTotal(marketData.data.total);
+        formatMarketData(marketData.data.data);
+      }
     })()
-  }, [pathname, selectedCategory, currentPage])
+  }, [pathname, selectedCategory, currentPage, refreshKey, showPendingOnHome])
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -228,18 +243,22 @@ const Market: React.FC = () => {
   };
 
   // Filter markets based on selected category
+  // marketField: 0 = Custom Market, 1 = Coin Prediction, 2 = Sports Prediction
   const filteredMarkets = markets.filter(market => {
     if (selectedCategory === "Trending") {
       return true; // Show all markets in Trending
     } else if (selectedCategory === "Sports") {
-      return market.marketField === 1; // Show sports markets
+      return market.marketField === 2; // Show sports markets
     } else if (selectedCategory === "Crypto") {
-      return market.marketField === 0 && market.task === "price"; // Show crypto markets
+      return market.marketField === 1; // Show crypto/coin markets
     } else if (selectedCategory === "News") {
-      return market.marketField === 0 && market.task !== "price"; // Show news markets
+      return market.marketField === 0; // Show custom markets
     }
     return true;
   });
+
+  // Determine which type of card to show based on path and status
+  const showPendingCards = pathname === "/fund" || (pathname === "/" && showPendingOnHome);
 
   return (
     <div className="w-full flex flex-col justify-start items-start gap-6">
@@ -252,12 +271,12 @@ const Market: React.FC = () => {
           <div className="max-w-md p-8 bg-white rounded-2xl border-4 border-black text-center">
             <div className="text-6xl mb-4">📊</div>
             <h3 className="text-2xl font-extrabold text-[#0b1f3a] mb-2">
-              {activeTab === "ACTIVE" ? "No Active Markets" : "No Pending Markets"}
+              {showPendingCards ? "No Pending Markets" : "No Active Markets"}
             </h3>
             <p className="text-[#0b1f3a] opacity-70">
-              {activeTab === "ACTIVE" 
-                ? "There are currently no active markets. Check back soon!" 
-                : "There are currently no markets awaiting funding. Check the active markets or create a new one!"}
+              {showPendingCards
+                ? "There are currently no markets awaiting funding. Check the active markets or create a new one!" 
+                : "There are currently no active markets. Check back soon!"}
             </p>
           </div>
         </div>
@@ -268,13 +287,7 @@ const Market: React.FC = () => {
             : "2xl:grid-cols-3 xl:grid-cols-3 lg:grid-cols-2 sm:grid-cols-1"
         }`}>
           {filteredMarkets.map((prediction, index) =>
-            activeTab === "ACTIVE" ? (
-              <PredictionCard
-                key={prediction._id}
-                index={markets.indexOf(prediction)}
-                currentPage={currentPage}
-              />
-            ) : (
+            showPendingCards ? (
               <PendingCard
                 key={prediction._id}
                 index={markets.indexOf(prediction)}
@@ -284,6 +297,12 @@ const Market: React.FC = () => {
                 timeLeft={prediction.date}
                 comments={0}
                 imageUrl={prediction.imageUrl}
+              />
+            ) : (
+              <PredictionCard
+                key={prediction._id}
+                index={markets.indexOf(prediction)}
+                currentPage={currentPage}
               />
             )
           )}

@@ -2,18 +2,19 @@
 
 import Market from "@/components/elements/marketInfo/Market";
 import { useGlobalContext } from "@/providers/GlobalContext";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 export default function FundMarket() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { setActiveTab } = useGlobalContext(); // Ensure setActiveTab exists in context
 
   useEffect(() => {
     if (pathname === "/fund") {
       setActiveTab("PENDING"); // Update tab
     }
-  }, [pathname, setActiveTab]); // Dependency array ensures it runs on pathname change
+  }, [pathname, setActiveTab, searchParams]); // Add searchParams to force refresh on navigation
 
   return (
     <div className="w-full sm:px-[42px] px-5 flex flex-col justify-start items-start gap-[50px] overflow-y-auto overflow-x-hidden">

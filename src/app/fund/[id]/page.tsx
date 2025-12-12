@@ -45,9 +45,17 @@ export default function FundDetail() {
   const onFund = async () => {
     try {
       if (!wallet.connected) {
-        errorAlert("Failed funding")
+        errorAlert("Please connect your wallet first!")
         return
       }
+      
+      if (fundAmount <= 0) {
+        errorAlert("Please enter a valid funding amount!")
+        return
+      }
+
+      infoAlert("Processing your funding transaction...");
+      
       const status = await depositLiquidity({ amount: fundAmount, market_id: market.market, wallet });
       console.log("fundAmount:", fundAmount );
       
@@ -58,12 +66,21 @@ export default function FundDetail() {
       const result = await axios.post("/api/market/liquidity", { market_id: market._id, amount: fundAmount, investor: wallet.publicKey?.toBase58(), active });
 
       if (result.status === 200) {
-        infoAlert("Funed successfully!");
-        router.replace(`/fund`);
+        if (active) {
+          infoAlert("Funded successfully! Market is now ACTIVE and available for trading!");
+          setTimeout(() => {
+            router.replace(`/?refresh=${Date.now()}`);
+          }, 1500);
+        } else {
+          infoAlert("Funded successfully! Market needs more funding to become active.");
+          setTimeout(() => {
+            router.replace(`/fund?refresh=${Date.now()}`);
+          }, 1500);
+        }
       }
     } catch (error) {
       console.error('Unexpected error:', error);
-      errorAlert("Failed deploying fund!")
+      errorAlert("Failed to add funding! Please try again.")
     }
   }
   return (

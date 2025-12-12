@@ -1,64 +1,176 @@
-{
-  "address": "2F4mpMnSUMDuhMwFnXAgz7xf7V2zYWPFzU12EAGxk8do",
-  "metadata": {
-    "name": "minimarket",
-    "version": "0.1.0",
-    "spec": "0.1.0",
-    "description": "Created with Anchor"
-  },
+﻿{
+  "version": "0.1.0",
+  "name": "prediction",
   "instructions": [
     {
-      "name": "add_liquidity",
-      "discriminator": [
-        181,
-        157,
-        89,
-        67,
-        143,
-        182,
-        52,
-        72
-      ],
+      "name": "initialize",
       "accounts": [
         {
-          "name": "user",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "fee_authority",
-          "writable": true
-        },
-        {
-          "name": "market",
-          "writable": true
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "global",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  103,
-                  108,
-                  111,
-                  98,
-                  97,
-                  108,
-                  95,
-                  115,
-                  101,
-                  101,
-                  100
-                ]
-              }
-            ]
-          }
+          "isMut": true,
+          "isSigner": false
         },
         {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "GlobalParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "getRes",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feedAggregator",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "feed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initMarket",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feeAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "globalPda",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "feed",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "metadataA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "metadataB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMintA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMintB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "params",
+          "type": {
+            "defined": "MarketParams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "addLiquidity",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feeAuthority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "global",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -69,847 +181,163 @@
       ]
     },
     {
-      "name": "create_bet",
-      "discriminator": [
-        197,
-        42,
-        153,
-        2,
-        59,
-        63,
-        143,
-        246
-      ],
+      "name": "createBet",
       "accounts": [
         {
           "name": "user",
-          "writable": true,
-          "signer": true
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "creator",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
-          "name": "token_mint",
+          "name": "tokenMint",
+          "isMut": true,
+          "isSigner": false,
           "docs": [
             "CHECK reward token"
-          ],
-          "writable": true
+          ]
         },
         {
-          "name": "pda_token_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "market"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "token_mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
+          "name": "pdaTokenAccount",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          "name": "user_token_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "user"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "token_mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          "name": "fee_authority",
-          "writable": true
+          "name": "feeAuthority",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "market",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "global",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  103,
-                  108,
-                  111,
-                  98,
-                  97,
-                  108,
-                  95,
-                  115,
-                  101,
-                  101,
-                  100
-                ]
-              }
-            ]
-          }
+          "isMut": false,
+          "isSigner": false
         },
         {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          "name": "associated_token_program"
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          "name": "token_metadata_program"
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
         {
           "name": "params",
           "type": {
-            "defined": {
-              "name": "BettingParams"
-            }
+            "defined": "BettingParams"
           }
         }
       ]
     },
     {
-      "name": "get_res",
-      "discriminator": [
-        31,
-        216,
-        159,
-        150,
-        195,
-        87,
-        242,
-        137
-      ],
+      "name": "mintToken",
       "accounts": [
         {
+          "name": "pdaTokenAAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pdaTokenBAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "user",
-          "writable": true,
-          "signer": true
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feeAuthority",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "market",
-          "writable": true
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "global",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  103,
-                  108,
-                  111,
-                  98,
-                  97,
-                  108,
-                  95,
-                  115,
-                  101,
-                  101,
-                  100
-                ]
-              }
-            ]
-          }
+          "isMut": false,
+          "isSigner": false
         },
         {
-          "name": "feed"
+          "name": "metadataA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          "name": "clock",
-          "address": "SysvarC1ock11111111111111111111111111111111"
+          "name": "metadataB",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "init_market",
-      "discriminator": [
-        33,
-        253,
-        15,
-        116,
-        89,
-        25,
-        127,
-        236
-      ],
-      "accounts": [
-        {
-          "name": "user",
-          "writable": true,
-          "signer": true
+          "name": "tokenMintA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          "name": "fee_authority",
-          "writable": true
+          "name": "tokenMintB",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          "name": "market",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  97,
-                  114,
-                  107,
-                  101,
-                  116,
-                  95,
-                  115,
-                  101,
-                  101,
-                  100
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "params.market_id"
-              }
-            ]
-          }
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          "name": "global_pda",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  103,
-                  108,
-                  111,
-                  98,
-                  97,
-                  108,
-                  95,
-                  115,
-                  101,
-                  101,
-                  100
-                ]
-              }
-            ]
-          }
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          "name": "feed"
+          "name": "tokenMetadataProgram",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          "name": "metadata_a",
-          "writable": true
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          "name": "metadata_b",
-          "writable": true
-        },
-        {
-          "name": "token_mint_a",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  105,
-                  110,
-                  116,
-                  95,
-                  97,
-                  95,
-                  115,
-                  101,
-                  101,
-                  100
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "market"
-              }
-            ]
-          }
-        },
-        {
-          "name": "token_mint_b",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  105,
-                  110,
-                  116,
-                  95,
-                  98,
-                  95,
-                  115,
-                  101,
-                  101,
-                  100
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "market"
-              }
-            ]
-          }
-        },
-        {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        },
-        {
-          "name": "associated_token_program"
-        },
-        {
-          "name": "token_metadata_program"
-        },
-        {
-          "name": "rent"
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
         {
-          "name": "params",
-          "type": {
-            "defined": {
-              "name": "MarketParams"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "initialize",
-      "discriminator": [
-        175,
-        175,
-        109,
-        31,
-        13,
-        152,
-        155,
-        237
-      ],
-      "accounts": [
-        {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "global",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  103,
-                  108,
-                  111,
-                  98,
-                  97,
-                  108,
-                  95,
-                  115,
-                  101,
-                  101,
-                  100
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "params",
-          "type": {
-            "defined": {
-              "name": "GlobalParams"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "mint_token",
-      "discriminator": [
-        172,
-        137,
-        183,
-        14,
-        207,
-        110,
-        234,
-        56
-      ],
-      "accounts": [
-        {
-          "name": "pda_token_a_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "market"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "token_mint_a"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "pda_token_b_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "market"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "token_mint_b"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "user",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "fee_authority",
-          "writable": true
-        },
-        {
-          "name": "market",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  97,
-                  114,
-                  107,
-                  101,
-                  116,
-                  95,
-                  115,
-                  101,
-                  101,
-                  100
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "market_id"
-              }
-            ]
-          }
-        },
-        {
-          "name": "global",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  103,
-                  108,
-                  111,
-                  98,
-                  97,
-                  108,
-                  95,
-                  115,
-                  101,
-                  101,
-                  100
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "metadata_a",
-          "writable": true
-        },
-        {
-          "name": "metadata_b",
-          "writable": true
-        },
-        {
-          "name": "token_mint_a",
-          "writable": true
-        },
-        {
-          "name": "token_mint_b",
-          "writable": true
-        },
-        {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        },
-        {
-          "name": "associated_token_program"
-        },
-        {
-          "name": "token_metadata_program"
-        },
-        {
-          "name": "rent"
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "market_id",
+          "name": "marketId",
           "type": "string"
         }
       ]
@@ -918,95 +346,424 @@
   "accounts": [
     {
       "name": "Global",
-      "discriminator": [
-        167,
-        232,
-        232,
-        177,
-        200,
-        108,
-        114,
-        127
-      ]
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "publicKey"
+          },
+          {
+            "name": "feeAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "creatorFeeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "liqudityUserFeeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "bettingUserFeeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "decimal",
+            "type": "u8"
+          },
+          {
+            "name": "marketCount",
+            "type": "u64"
+          },
+          {
+            "name": "feePercentage",
+            "type": "u8"
+          }
+        ]
+      }
     },
     {
       "name": "Market",
-      "discriminator": [
-        219,
-        190,
-        213,
-        55,
-        0,
-        227,
-        198,
-        154
-      ]
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
+            "name": "feed",
+            "type": "publicKey"
+          },
+          {
+            "name": "value",
+            "type": "f64"
+          },
+          {
+            "name": "range",
+            "type": "u8"
+          },
+          {
+            "name": "marketStatus",
+            "type": {
+              "defined": "MarketStatus"
+            }
+          },
+          {
+            "name": "result",
+            "type": "bool"
+          },
+          {
+            "name": "tokenA",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenB",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokenAAmount",
+            "type": "u64"
+          },
+          {
+            "name": "tokenBAmount",
+            "type": "u64"
+          },
+          {
+            "name": "tokenPriceA",
+            "type": "u64"
+          },
+          {
+            "name": "tokenPriceB",
+            "type": "u64"
+          },
+          {
+            "name": "yesAmount",
+            "type": "u16"
+          },
+          {
+            "name": "noAmount",
+            "type": "u16"
+          },
+          {
+            "name": "totalReserve",
+            "type": "u64"
+          },
+          {
+            "name": "resolutionDate",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "GlobalParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "feeAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "creatorFeeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "liqudityUserFeeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "bettingUserFeeAmount",
+            "type": "u64"
+          },
+          {
+            "name": "marketCount",
+            "type": "u64"
+          },
+          {
+            "name": "decimal",
+            "type": "u8"
+          },
+          {
+            "name": "feePercentage",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MarketParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "value",
+            "type": "f64"
+          },
+          {
+            "name": "range",
+            "type": "u8"
+          },
+          {
+            "name": "date",
+            "type": "i64"
+          },
+          {
+            "name": "tokenAmount",
+            "type": "u64"
+          },
+          {
+            "name": "tokenPrice",
+            "type": "u64"
+          },
+          {
+            "name": "marketId",
+            "type": "string"
+          },
+          {
+            "name": "nameA",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "nameB",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "symbolA",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "symbolB",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "urlA",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "urlB",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "BettingParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "marketId",
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "isYes",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MarketStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Prepare"
+          },
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Finished"
+          }
+        ]
+      }
     }
   ],
   "events": [
     {
-      "name": "BettingEvent",
-      "discriminator": [
-        135,
-        24,
-        236,
-        238,
-        30,
-        3,
-        38,
-        85
-      ]
-    },
-    {
       "name": "GlobalInitialized",
-      "discriminator": [
-        142,
-        186,
-        188,
-        168,
-        64,
-        228,
-        8,
-        20
-      ]
-    },
-    {
-      "name": "MarketCreated",
-      "discriminator": [
-        88,
-        184,
-        130,
-        231,
-        226,
-        84,
-        6,
-        58
-      ]
-    },
-    {
-      "name": "MarketStatusUpdated",
-      "discriminator": [
-        142,
-        245,
-        212,
-        171,
-        133,
-        72,
-        219,
-        195
+      "fields": [
+        {
+          "name": "globalId",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "feeRecipient",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "creatorFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "liqudityUserFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "bettingUserFeeAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "marketCount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "decimal",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "feePercentage",
+          "type": "u8",
+          "index": false
+        }
       ]
     },
     {
       "name": "OracleResUpdated",
-      "discriminator": [
-        49,
-        16,
-        89,
-        52,
-        40,
-        113,
-        213,
-        215
+      "fields": [
+        {
+          "name": "oracleRes",
+          "type": "f64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "MarketCreated",
+      "fields": [
+        {
+          "name": "marketId",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "value",
+          "type": "f64",
+          "index": false
+        },
+        {
+          "name": "range",
+          "type": "u8",
+          "index": false
+        },
+        {
+          "name": "creator",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "feed",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "tokenA",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "tokenB",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "marketStatus",
+          "type": {
+            "defined": "MarketStatus"
+          },
+          "index": false
+        },
+        {
+          "name": "tokenAAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "tokenBAmount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "tokenPriceA",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "tokenPriceB",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "totalReserve",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "MarketStatusUpdated",
+      "fields": [
+        {
+          "name": "marketId",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "marketStatus",
+          "type": {
+            "defined": "MarketStatus"
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "BettingEvent",
+      "fields": [
+        {
+          "name": "tokenAPrice",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "tokenBPrice",
+          "type": "u64",
+          "index": false
+        }
       ]
     }
   ],
@@ -1028,454 +785,41 @@
     },
     {
       "code": 6003,
-      "name": "InvalidFundAmount",
-      "msg": "Invalid fund amount"
-    },
-    {
-      "code": 6004,
       "name": "SolPriceBelowUnlockPrice",
       "msg": "Current SOL price is not above Escrow unlock price."
     },
     {
-      "code": 6005,
+      "code": 6004,
       "name": "ArithmeticError",
       "msg": "Arithmetic error"
     },
     {
-      "code": 6006,
+      "code": 6005,
       "name": "InvalidCreator",
       "msg": "Invalid creator"
     },
     {
-      "code": 6007,
+      "code": 6006,
       "name": "InvalidFeeAuthority",
       "msg": "Invalid fee authority"
     },
     {
-      "code": 6008,
+      "code": 6007,
       "name": "NotPreparing",
       "msg": "Not preparing status"
     },
     {
-      "code": 6009,
+      "code": 6008,
       "name": "InvalidMarket",
       "msg": "Invalid market"
     },
     {
-      "code": 6010,
+      "code": 6009,
       "name": "MarketNotActive",
       "msg": "Market is not active"
-    },
-    {
-      "code": 6011,
-      "name": "InvalidAdmin",
-      "msg": "Invalid Admin"
     }
   ],
-  "types": [
-    {
-      "name": "BettingEvent",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "token_a_price",
-            "type": "u64"
-          },
-          {
-            "name": "token_b_price",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "BettingParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "market_id",
-            "type": "string"
-          },
-          {
-            "name": "amount",
-            "type": "u64"
-          },
-          {
-            "name": "is_yes",
-            "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "Global",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "admin",
-            "type": "pubkey"
-          },
-          {
-            "name": "fee_authority",
-            "type": "pubkey"
-          },
-          {
-            "name": "creator_fee_amount",
-            "type": "u64"
-          },
-          {
-            "name": "decimal",
-            "type": "u8"
-          },
-          {
-            "name": "market_count",
-            "type": "u64"
-          },
-          {
-            "name": "betting_fee_percentage",
-            "type": "f64"
-          },
-          {
-            "name": "fund_fee_percentage",
-            "type": "f64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "GlobalInitialized",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "global_id",
-            "type": "pubkey"
-          },
-          {
-            "name": "fee_recipient",
-            "type": "pubkey"
-          },
-          {
-            "name": "creator_fee_amount",
-            "type": "u64"
-          },
-          {
-            "name": "market_count",
-            "type": "u64"
-          },
-          {
-            "name": "decimal",
-            "type": "u8"
-          },
-          {
-            "name": "fund_fee_percentage",
-            "type": "f64"
-          },
-          {
-            "name": "betting_fee_percentage",
-            "type": "f64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "GlobalParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "fee_authority",
-            "type": "pubkey"
-          },
-          {
-            "name": "creator_fee_amount",
-            "type": "u64"
-          },
-          {
-            "name": "market_count",
-            "type": "u64"
-          },
-          {
-            "name": "decimal",
-            "type": "u8"
-          },
-          {
-            "name": "betting_fee_percentage",
-            "type": "f64"
-          },
-          {
-            "name": "fund_fee_percentage",
-            "type": "f64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "Market",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "value",
-            "type": "f64"
-          },
-          {
-            "name": "range",
-            "type": "u8"
-          },
-          {
-            "name": "creator",
-            "type": "pubkey"
-          },
-          {
-            "name": "feed",
-            "type": "pubkey"
-          },
-          {
-            "name": "token_a",
-            "type": "pubkey"
-          },
-          {
-            "name": "token_b",
-            "type": "pubkey"
-          },
-          {
-            "name": "market_status",
-            "type": {
-              "defined": {
-                "name": "MarketStatus"
-              }
-            }
-          },
-          {
-            "name": "token_a_amount",
-            "type": "u64"
-          },
-          {
-            "name": "token_b_amount",
-            "type": "u64"
-          },
-          {
-            "name": "token_price_a",
-            "type": "u64"
-          },
-          {
-            "name": "token_price_b",
-            "type": "u64"
-          },
-          {
-            "name": "total_reserve",
-            "type": "u64"
-          },
-          {
-            "name": "yes_amount",
-            "type": "u64"
-          },
-          {
-            "name": "no_amount",
-            "type": "u64"
-          },
-          {
-            "name": "result",
-            "type": "bool"
-          },
-          {
-            "name": "bump",
-            "type": "u8"
-          },
-          {
-            "name": "date",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "MarketCreated",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "market_id",
-            "type": "pubkey"
-          },
-          {
-            "name": "value",
-            "type": "f64"
-          },
-          {
-            "name": "range",
-            "type": "u8"
-          },
-          {
-            "name": "creator",
-            "type": "pubkey"
-          },
-          {
-            "name": "feed",
-            "type": "pubkey"
-          },
-          {
-            "name": "token_a",
-            "type": "pubkey"
-          },
-          {
-            "name": "token_b",
-            "type": "pubkey"
-          },
-          {
-            "name": "market_status",
-            "type": {
-              "defined": {
-                "name": "MarketStatus"
-              }
-            }
-          },
-          {
-            "name": "token_a_amount",
-            "type": "u64"
-          },
-          {
-            "name": "token_b_amount",
-            "type": "u64"
-          },
-          {
-            "name": "token_price_a",
-            "type": "u64"
-          },
-          {
-            "name": "token_price_b",
-            "type": "u64"
-          },
-          {
-            "name": "total_reserve",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "MarketParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "market_id",
-            "type": "string"
-          },
-          {
-            "name": "value",
-            "type": "f64"
-          },
-          {
-            "name": "range",
-            "type": "u8"
-          },
-          {
-            "name": "token_amount",
-            "type": "u64"
-          },
-          {
-            "name": "token_price",
-            "type": "u64"
-          },
-          {
-            "name": "date",
-            "type": "i64"
-          },
-          {
-            "name": "name_a",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
-            "name": "symbol_a",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
-            "name": "url_a",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
-            "name": "name_b",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
-            "name": "symbol_b",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
-            "name": "url_b",
-            "type": {
-              "option": "string"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "MarketStatus",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Created"
-          },
-          {
-            "name": "Prepare"
-          },
-          {
-            "name": "Active"
-          },
-          {
-            "name": "Resolved"
-          }
-        ]
-      }
-    },
-    {
-      "name": "MarketStatusUpdated",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "market_id",
-            "type": "pubkey"
-          },
-          {
-            "name": "market_status",
-            "type": {
-              "defined": {
-                "name": "MarketStatus"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "OracleResUpdated",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "oracle_res",
-            "type": "f64"
-          }
-        ]
-      }
-    }
-  ]
+  "metadata": {
+    "address": "8CSBdHqRErYAERtVLutBkkBCWcKLimqRzvZ7kXKujcGC"
+  }
 }

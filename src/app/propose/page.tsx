@@ -246,13 +246,13 @@ export default function Propose() {
   const chnageDataSource = (index: number) => {
     setMarketFieldContentIndex(index);
     setMarketFieldContentOpen(false);
-    setData({
-      // Provide default values based on the ProposeType structure
+    setData((prevData) => ({
+      // Preserve imageUrl when changing data source
       marketField: marketFieldIndex,
-      apiType: marketFieldContentIndex,
+      apiType: index, // Use the new index
       range: 0,
       question: "",
-      imageUrl: "",
+      imageUrl: prevData.imageUrl, // Keep the uploaded image
       feedName: "",
       dataLink: "",
       date: "",
@@ -260,8 +260,13 @@ export default function Propose() {
       value: 0,
       creator: "",
       description: ""
-    });
+    }));
     setTokenSearch("");
+    setSelectedToken(null);
+    setMarket([]); // Reset DEX list
+    setDexIndex(0); // Reset DEX selection
+    setNeededDataError(false);
+    infoAlert(`Data source changed to ${marketField[marketFieldIndex].content[index].api_name}`);
   }
 
   const onSubmit = async () => {
@@ -275,6 +280,18 @@ export default function Propose() {
         return
       }
 
+      // Validate image is uploaded
+      if (!data.imageUrl || data.imageUrl.trim() === "") {
+        errorAlert("Please upload a market image!");
+        setError((prevError) => ({
+          ...prevError,
+          imageUrl: "Image is required",
+        }));
+        return;
+      }
+
+      console.log("📸 Image URL before submission:", data.imageUrl);
+
       setActive(false);
 
       // Handle sports prediction data
@@ -285,11 +302,26 @@ export default function Propose() {
           return;
         }
         params.push(selectedSport, selectedLeague, selectedTeam, selectedStatType);
+      } else if (marketField[marketFieldIndex].name === "Custom Market") {
+        // Handle custom market - uses description field directly
+        if (!data.description || data.description.trim() === "") {
+          setNeededDataError(true);
+          setActive(true);
+          errorAlert("Please enter your prediction question!");
+          return;
+        }
+        if (!data.date) {
+          errorAlert("Please select a resolution date!");
+          setActive(true);
+          return;
+        }
+        // Custom markets don't need API calls
+        params.push(data.description);
       } else {
-        // Handle other market types
+        // Handle other market types (Coin/Token markets)
         const element = need_key[0];
         const elem_val = document.getElementById(element.name) as HTMLInputElement;
-        if (elem_val.value === "") {
+        if (!elem_val || elem_val.value === "") {
           setNeededDataError(true);
           setActive(true);
           return
@@ -297,6 +329,7 @@ export default function Propose() {
         if (marketField[marketFieldIndex].name === "Coingecho") {
           if (!selectedToken) {
             errorAlert("Invalid Token Ticker!");
+            setActive(true);
             return
           }
           
@@ -307,38 +340,159 @@ export default function Propose() {
         params.push(data.range);
       }
 
-      const api_link = market_detail.api_link(...params);
-      console.log("api_link:", api_link);
-      
-      const response = await axios.get(api_link);
-      const task = market_detail.task(dexIndex, data.range) !== "null" ? market_detail.task(dexIndex, data.range) : findJsonPathsForKey(JSON.stringify(response.data), data.range?"market_cap" : "usd")[0];
-      console.log("task:", task);
+      // Handle API and task based on market type
+      let api_link = "";
+      let task = "";
+
+      if (marketField[marketFieldIndex].name === "Custom Market") {
+        // Custom markets don't need API
+        api_link = "";
+        task = "custom";
+        data.question = data.description;
+      } else {
+        // Handle regular markets with API
+        api_link = market_detail.api_link(...params);
+        console.log("📡 Oracle Feed API URL:", api_link);
+        
+        const response = await axios.get(api_link);
+        
+        // For Dexscreener with multiple pairs, use the selected DEX index
+        if (market.length > 0) {
+          console.log(`🔄 DEX Selection: Using index ${dexIndex} (${market[dexIndex]}) from ${market.length} available pairs`);
+        }
+        
+        const detailTask = market_detail.task(dexIndex, data.range);
+        const jsonPaths = findJsonPathsForKey(JSON.stringify(response.data), data.range ? "market_cap" : "usd");
+        
+        // Set task with fallback logic
+        if (detailTask && detailTask !== "null") {
+          task = detailTask;
+          console.log(`✅ Using configured JSON path: ${task}`);
+        } else if (jsonPaths && jsonPaths.length > 0) {
+          task = jsonPaths[0];
+          console.log(`⚠️ Using fallback JSON path: ${task}`);
+        } else {
+          // Default fallback task based on market type
+          task = data.range ? "market_cap" : "price";
+          console.log(`⚠️ Using default task: ${task}`);
+        }
+        
+        console.log("📊 Final Oracle Configuration:", {
+          url: api_link,
+          jsonPath: task,
+          dataSource: marketField[marketFieldIndex].content[marketFieldContentIndex].api_name,
+          dexPair: market.length > 0 ? market[dexIndex] : 'N/A'
+        });
+
+        // Update question based on market type
+        if (marketField[marketFieldIndex].name === "Sports Prediction Market") {
+          data.question = `Will ${selectedTeam} ${selectedStatType.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')} reach ${data.value} by ${data.date}?`;
+        } else {
+          data.question = data.range? `Will ${elipsKey(data.feedName)} reach a market cap of $ ${data.value} by ${data.date}?` : `Will ${elipsKey(data.feedName)} reach a per token price of $ ${data.value} by ${data.date}?`
+        }
+      }
 
       data.dataLink = api_link;
       data.task = task;
+      
+      // Ensure task is not empty
+      if (!data.task || data.task.trim() === '') {
+        errorAlert("Failed to determine data task. Please try again.");
+        setActive(true);
+        return;
+      }
+      
       data.creator = wallet.publicKey.toBase58() || "";
       data.marketField = marketFieldIndex;
       data.apiType = marketFieldContentIndex;
 
-      // Update question based on market type
-      if (marketField[marketFieldIndex].name === "Sports Prediction Market") {
-        data.question = `Will ${selectedTeam} ${selectedStatType.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')} reach ${data.value} by ${data.date}?`;
-      } else {
-        data.question = data.range? `Will ${elipsKey(data.feedName)} reach a market cap of $ ${data.value} by ${data.date}?` : `Will ${elipsKey(data.feedName)} reach a per token price of $ ${data.value} by ${data.date}?`
-      }
-
+      console.log("🚀 Sending market data to API:", { 
+        task: data.task, 
+        question: data.question, 
+        creator: data.creator 
+      });
+      
       const res = await axios.post("/api/market/create", { data, isChecked });
       const market_id = res.data.result;
+      
+      console.log("✅ Market created with ID:", market_id);
 
+      // Validate anchorWallet before creating feed
+      if (!anchorWallet || !anchorWallet.publicKey || !anchorWallet.signTransaction) {
+        console.error("❌ Anchor wallet not properly initialized:", {
+          hasAnchorWallet: !!anchorWallet,
+          hasPublicKey: !!anchorWallet?.publicKey,
+          hasSignTransaction: !!anchorWallet?.signTransaction
+        });
+        errorAlert("Wallet connection error. Please disconnect and reconnect your wallet.");
+        setActive(true);
+        return;
+      }
+      
+      // Show oracle configuration to user
+      if (marketField[marketFieldIndex].name === "Coin Prediction Market" && market.length > 0) {
+        infoAlert(`Creating oracle feed for ${market[dexIndex]} trading pair...`);
+      }
+      
+      // Create oracle feed - simplified validation like solana-prediction-market
       const cluster = process.env.CLUSTER === "Mainnet" ? "Mainnet" : "Devnet";
-      const feed_result = await customizeFeed({ url: data.dataLink, task, name: data.feedName, cluster, wallet: anchorWallet });
+      console.log("🌐 Using cluster:", cluster);
+      
+      // Show oracle configuration to user
+      if (marketField[marketFieldIndex].name === "Coin Prediction Market" && market.length > 0) {
+        infoAlert(`Creating oracle feed for ${market[dexIndex]} trading pair...`);
+      }
+      
+      let feed_result;
+      if (marketField[marketFieldIndex].name === "Custom Market") {
+        // Custom markets use manual resolution, so we can create a simple feed
+        console.log("Creating custom market feed");
+        feed_result = await customizeFeed({ 
+          url: "https://api.example.com/custom", 
+          task: "custom", 
+          name: data.description.substring(0, 32), 
+          cluster, 
+          wallet: anchorWallet 
+        });
+      } else {
+        console.log("Creating oracle feed with config:", {
+          url: data.dataLink,
+          task: task,
+          name: data.feedName,
+          cluster: cluster
+        });
+        
+        feed_result = await customizeFeed({ 
+          url: data.dataLink, 
+          task, 
+          name: data.feedName, 
+          cluster, 
+          wallet: anchorWallet 
+        });
+      }
+      
       console.log("feed_result:", feed_result);
+      
+      // Simple validation matching solana-prediction-market
+      if (feed_result && feed_result.error) {
+        console.error("❌ Oracle feed creation failed:", feed_result);
+        const errorDetails = `\n\nConfiguration:\n- Data Source: ${marketField[marketFieldIndex].content[marketFieldContentIndex].api_name}\n- API URL: ${data.dataLink}\n- JSON Path: ${task}${market.length > 0 ? `\n- DEX Pair: ${market[dexIndex]}` : ''}`;
+        errorAlert((feed_result.result || "Failed to create oracle feed. Please check your data link and task.") + errorDetails);
+        setActive(true);
+        return;
+      }
+      
+      console.log("✅ Oracle feed created successfully:", {
+        feedPublicKey: feed_result.feedKeypair.publicKey.toBase58(),
+        dataSource: marketField[marketFieldIndex].content[marketFieldContentIndex].api_name,
+        dexPair: market.length > 0 ? market[dexIndex] : 'N/A'
+      });
 
       const create_result = await createMarket({
         marketID: market_id,
         date: data.date,
-        value: data.value,
-        feed: feed_result.feedKeypair!,
+        value: data.value || 0,
+        feed: feed_result.feedKeypair,
         wallet,
         anchorWallet
       });
@@ -348,8 +502,11 @@ export default function Propose() {
       const update_res = await axios.post("/api/market/add", { data: { ...create_result, id: market_id } });
 
       if (update_res.status === 200) {
-        infoAlert("Market created successfully!");
-        router.push(`/fund`);
+        infoAlert("Market created successfully! Redirecting to funding page...");
+        // Add a small delay to ensure the market is fully saved before redirecting
+        setTimeout(() => {
+          router.push(`/fund?refresh=${Date.now()}`);
+        }, 1000);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -479,7 +636,7 @@ export default function Propose() {
                 )}
               </div>
 
-              {/* Sports Selection or API Selection */}
+              {/* Sports Selection, Data Source Selection, or Nothing for Custom */}
               {marketField[marketFieldIndex].name === "Sports Prediction Market" ? (
                 <div className="space-y-4">
                   <div className="text-[#0b1f3a] text-xl font-bold">Step 3: Select Your Sport</div>
@@ -497,7 +654,7 @@ export default function Propose() {
                       </svg>
                     </button>
                     {sportOpen && (
-                      <div className="absolute z-10 w-full mt-1 bg-white rounded-lg border-2 border-black shadow-lg">
+                      <div className="absolute z-10 w-full mt-1 bg-white rounded-lg border-2 border-black shadow-lg max-h-60 overflow-y-auto">
                         {Object.keys(sportsData).map((sport) => (
                           <div
                             key={sport}
@@ -517,34 +674,41 @@ export default function Propose() {
                     )}
                   </div>
                 </div>
-              ) : (
+              ) : marketField[marketFieldIndex].name === "Coin Prediction Market" ? (
                 <div className="flex flex-col gap-4 relative">
-                  <div className="text-[#0b1f3a] text-xl font-bold">Step 3: Select Your Data Source</div>
+                  <div className="text-[#0b1f3a] text-xl font-bold">Step 3: Select Your Oracle Feed Platform</div>
                   <button 
-                    className="w-full text-[#0b1f3a] px-4 py-3 text-lg font-medium bg-white rounded-lg border-2 border-black flex justify-between items-center hover:bg-gray-50 transition-colors" 
+                    className="w-full text-[#0b1f3a] px-4 py-3 text-lg font-medium bg-white rounded-lg border-2 border-black flex justify-between items-center hover:bg-gray-50 transition-colors shadow-sm" 
                     onClick={() => setMarketFieldContentOpen(!marketFieldContentOpen)}
                   >
-                    {marketField[marketFieldIndex].content[marketFieldContentIndex].api_name}
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 10 6">``
+                    <div className="flex items-center gap-2">
+                      <span className="text-[#0b1f3a] font-bold">📡</span>
+                      <span>{marketField[marketFieldIndex].content[marketFieldContentIndex].api_name}</span>
+                    </div>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 10 6">
                       <path stroke="currentColor" d="m1 1 4 4 4-4" />
                     </svg>
                   </button>
 
                   {marketFieldContentOpen && (
-                    <div className="w-full bg-white rounded-lg border-2 border-black absolute left-0 bottom-[-100px] z-10 shadow-lg">
+                    <div className="w-full bg-white rounded-lg border-2 border-black absolute left-0 top-[72px] z-10 shadow-xl">
                       {marketField[marketFieldIndex].content.map((field, index) => (
                         <div
-                          key={index}
-                          className="px-4 py-3 hover:bg-gray-100 cursor-pointer transition-colors text-[#0b1f3a] border-b border-gray-200 last:border-b-0"
+                          key={"feed-platform-" + index}
+                          className="px-4 py-3 hover:bg-gray-100 cursor-pointer transition-colors text-[#0b1f3a] border-b border-gray-200 last:border-b-0 flex items-center gap-2"
                           onClick={() => chnageDataSource(index)}
                         >
-                          {field.api_name}
+                          <span className="text-[#0b1f3a] font-bold">📡</span>
+                          <span className="font-medium">{field.api_name}</span>
                         </div>
                       ))}
                     </div>
                   )}
+                  <div className="text-[#0b1f3a]/60 text-xs">
+                    Choose the data feed platform for real-time price oracle updates
+                  </div>
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
 
@@ -797,12 +961,17 @@ export default function Propose() {
                 {/* Token Ticker - Only show for coin markets */}
                 <div className="flex flex-col gap-6">
                   <div className="flex flex-col gap-2">
-                    <div className="text-[#0b1f3a] text-sm font-bold">Token Ticker</div>
+                    <div className="flex items-center justify-between">
+                      <div className="text-[#0b1f3a] text-sm font-bold">Token Ticker</div>
+                      <div className="text-[#0b1f3a]/60 text-xs font-medium px-2 py-1 bg-gray-100 rounded border border-gray-300">
+                        Using: {marketField[marketFieldIndex].content[marketFieldContentIndex].api_name}
+                      </div>
+                    </div>
                     <div className="relative">
                       <input
                         type="text"
                         className="w-full px-4 py-3 text-[#0b1f3a] text-lg font-medium bg-white rounded-lg border-2 border-black focus:outline-none focus:ring-2 focus:ring-[#0b1f3a] transition-all"
-                        placeholder={`${marketField[marketFieldIndex].content[marketFieldContentIndex].api_name === "Coingecho"? `Search for a token (e.g. BTC, ETH, etc.)`: `2bvTCZrV2wm5sDj2KENEbERzAXo3w499cVB9wDbXbonk`}`}
+                        placeholder={`${marketField[marketFieldIndex].content[marketFieldContentIndex].api_name === "Coingecho"? `Search for a token (e.g. BTC, ETH, etc.)`: `Enter Solana token address`}`}
                         value={tokenSearch}
                         id={marketField[marketFieldIndex].content[marketFieldContentIndex].needed_data[0].name}
                         onChange={updateTokenTicker}
@@ -840,6 +1009,12 @@ export default function Propose() {
                       )}
                     </div>
                     <div className={`text-red ${needDataError ? "" : "invisible"}`}>*Please enter a token ticker</div>
+                    {/* Platform-specific helper text */}
+                    <div className="text-[#0b1f3a]/60 text-xs">
+                      {marketField[marketFieldIndex].content[marketFieldContentIndex].api_name === "Coingecho" 
+                        ? "📊 CoinGecko provides data for major cryptocurrencies with market cap and price information"
+                        : "🔗 DexScreener tracks Solana DEX pairs - enter the token's contract address to see available trading pairs"}
+                    </div>
                   </div>
                   {/* Token Verification Link and ID */}
                   {selectedToken && (
@@ -858,32 +1033,39 @@ export default function Propose() {
                   {market.length > 0 &&
                     ( 
                       <div className="flex flex-col gap-4 relative">
-                        <div className="text-[#0b1f3a] text-xl font-bold">Choose DEX platform</div>
+                        <div className="text-[#0b1f3a] text-xl font-bold flex items-center gap-2">
+                          <span>🔄</span>
+                          <span>Choose DEX Trading Pair</span>
+                        </div>
                         <button 
-                          className="w-full text-[#0b1f3a] px-4 py-3 text-lg font-medium bg-white rounded-lg border-2 border-black flex justify-between items-center hover:bg-gray-50 transition-colors" 
+                          className="w-full text-[#0b1f3a] px-4 py-3 text-lg font-medium bg-white rounded-lg border-2 border-black flex justify-between items-center hover:bg-gray-50 transition-colors shadow-sm" 
                           onClick={() => setSelectDex(!selectDex)}
                         >
-                          {market[dexIndex]}
+                          <span className="font-bold">{market[dexIndex]}</span>
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 10 6">
                             <path stroke="currentColor" d="m1 1 4 4 4-4" />
                           </svg>
                         </button>
                         {selectDex && (
-                          <div id="market_catagory" className="w-full bg-white rounded-lg border-2 border-black absolute left-0 bottom-[-100px] z-10 shadow-lg">
+                          <div id="dex_selection" className="w-full bg-white rounded-lg border-2 border-black absolute left-0 top-[72px] z-10 shadow-xl max-h-60 overflow-y-auto">
                             {market.map((dex, index) => (
                               <div
-                                key={"market-field-" + index }
+                                key={"dex-platform-" + index }
                                 className="px-4 py-3 hover:bg-gray-100 cursor-pointer transition-colors text-[#0b1f3a] border-b border-gray-200 last:border-b-0"
                                 onClick={() => {
                                   setSelectDex(false);
                                   setDexIndex(index);
+                                  infoAlert(`Selected ${dex} trading pair`);
                                 }}
                               >
-                                {dex}
+                                <span className="font-medium">{dex}</span>
                               </div>
                             ))}
                           </div>
                         )}
+                        <div className="text-[#0b1f3a]/60 text-xs">
+                          📈 Found {market.length} trading pair{market.length !== 1 ? 's' : ''} for this token. Select the DEX you want to track.
+                        </div>
                     </div>
                     )
                   }
@@ -944,6 +1126,25 @@ export default function Propose() {
                       </button>
                     </div>
                   </div>
+                  
+                  {/* Oracle Feed Configuration Summary */}
+                  {data.feedName && market.length > 0 && (
+                    <div className="mt-4 p-4 bg-blue-50 border-2 border-blue-300 rounded-lg">
+                      <div className="text-[#0b1f3a] text-sm font-bold mb-2 flex items-center gap-2">
+                        <span>📡</span>
+                        <span>Oracle Feed Configuration</span>
+                      </div>
+                      <div className="space-y-1 text-xs text-[#0b1f3a]/80">
+                        <div><span className="font-semibold">Data Source:</span> {marketField[marketFieldIndex].content[marketFieldContentIndex].api_name}</div>
+                        <div><span className="font-semibold">Token:</span> {data.feedName}</div>
+                        <div><span className="font-semibold">Tracking Pair:</span> <span className="font-mono bg-white px-1 py-0.5 rounded">{market[dexIndex]}</span></div>
+                        <div><span className="font-semibold">Data Type:</span> {data.range === 0 ? "Price per Token" : "Market Cap"}</div>
+                      </div>
+                      <div className="mt-2 text-[10px] text-[#0b1f3a]/60">
+                        ✓ Switchboard oracle will fetch real-time data from this configuration
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

@@ -90,11 +90,13 @@ export type DepositeLiquidityType = {
     market_id: string,
     amount: number,
     wallet: WalletContextState,
+    anchorWallet: AnchorWallet,
 }
 
 export type BetType = {
     creator: string,
     player: AnchorWallet,
+    anchorWallet: AnchorWallet,
     marketId: string,
     amount: number,
     isYes: boolean,

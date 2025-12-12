@@ -1,18 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Icon from "@/components/elements/Icons";
 import { useGlobalContext } from "@/providers/GlobalContext";
 import { usePathname } from "next/navigation";
 import { RxHamburgerMenu } from "react-icons/rx";
 import Link from "next/link";
-import {
-  WalletMultiButton,
-  WalletDisconnectButton,
-  BaseWalletMultiButton
-} from "@solana/wallet-adapter-react-ui";
+import dynamic from "next/dynamic";
 import { useWallet, useAnchorWallet } from "@solana/wallet-adapter-react";
 import { useConnection } from "@solana/wallet-adapter-react";
+
+// Dynamically import WalletMultiButton to prevent hydration issues
+const WalletMultiButton = dynamic(
+  async () => (await import("@solana/wallet-adapter-react-ui")).WalletMultiButton,
+  { ssr: false }
+);
 
 interface HeaderTopProps {
   isCollapsed?: boolean;
@@ -22,6 +24,11 @@ const HeaderTop: React.FC<HeaderTopProps> = ({ isCollapsed }) => {
   const { activeTab, setActiveTab } = useGlobalContext(); // Use Global Context
   const wallet = useWallet();
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <div className="flex flex-col relative">
@@ -147,7 +154,7 @@ const HeaderTop: React.FC<HeaderTopProps> = ({ isCollapsed }) => {
               Connect Wallet
             </span>
           </button> */}
-          <WalletMultiButton style={{ borderRadius: "15px", backgroundColor: "#0b1f3a", color: "#fff", boxShadow: "0 2px 8px rgba(0,0,0,0.15)", border: "2px solid #0b1f3a" }} ></WalletMultiButton>
+          {mounted && <WalletMultiButton style={{ borderRadius: "15px", backgroundColor: "#0b1f3a", color: "#fff", boxShadow: "0 2px 8px rgba(0,0,0,0.15)", border: "2px solid #0b1f3a" }} />}
         </div>
       </div>
       <div className="px-[50px]">

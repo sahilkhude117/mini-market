@@ -304,9 +304,13 @@ export default function Home() {
                 Bet Amount
               </div>
             </div>
-            {profileData? profileData.bettingHistory.map((item: any, index: number) => (
-              <HistoryItem key={index} {...item} />
-            )): ""}
+            {profileData && profileData.bettingHistory && profileData.bettingHistory.length > 0 ? (
+              profileData.bettingHistory.map((item: any, index: number) => (
+                <HistoryItem key={index} {...item} />
+              ))
+            ) : (
+              <div className="w-full p-8 text-center text-[#0b1f3a]/70">No betting history available</div>
+            )}
           </>
         )}
 
@@ -332,9 +336,13 @@ export default function Home() {
                 Ext. Payment
               </div>
             </div>
-            {profileData? profileData.fundedMarkets.map((fund: any, index: any) => (
-              <ProfileFundItem key={index} {...fund} />
-            )): ""}
+            {profileData && profileData.fundedMarkets && profileData.fundedMarkets.length > 0 ? (
+              profileData.fundedMarkets.map((fund: any, index: any) => (
+                <ProfileFundItem key={index} {...fund} />
+              ))
+            ) : (
+              <div className="w-full p-8 text-center text-[#0b1f3a]/70">No funded markets available</div>
+            )}
           </>
         )}
 
@@ -360,9 +368,13 @@ export default function Home() {
                 Initial Liquidity
               </div>
             </div>
-            {profileData? profileData.proposedMarket.map((proposal: any, index: any) => (
-              <ProfileProposeItem key={index} {...proposal} />
-            )) : ""}
+            {profileData && profileData.proposedMarket && profileData.proposedMarket.length > 0 ? (
+              profileData.proposedMarket.map((proposal: any, index: any) => (
+                <ProfileProposeItem key={index} {...proposal} />
+              ))
+            ) : (
+              <div className="w-full p-8 text-center text-[#0b1f3a]/70">No proposed markets available</div>
+            )}
           </>
         )}
 

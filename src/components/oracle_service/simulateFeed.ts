@@ -11,6 +11,16 @@ import { RegistType } from "../../types/type";
 
 
 export const customizeFeed = async (param: RegistType) => {
+    console.log("🚀 customizeFeed STARTED");
+    try {
+        console.log("📡 customizeFeed called with:", {
+            url: param.url,
+            task: param.task,
+            name: param.name,
+            cluster: param.cluster,
+            hasWallet: !!param.wallet,
+            walletPublicKey: param.wallet?.publicKey?.toBase58()
+        });
 
     const jobs: OracleJob[] = [
         OracleJob.create({
@@ -50,15 +60,20 @@ export const customizeFeed = async (param: RegistType) => {
     // Check response.
     if (response.ok) {
         const data = await response.json();
-        console.log(`Response is good`);
+        console.log(`✅ Oracle simulation successful`);
         console.log(JSON.stringify(data, null, 2));
         if (!data.result) {
-            return {result: "Invalid Resolution link or task. Please check again.", error: true};
+            const errorObj = {result: "❌ Invalid data feed URL or JSON path. Please verify:\n1. The API endpoint is accessible\n2. The JSON path exists in the response\n3. The API returns numeric data", error: true};
+            console.log("🔴 EARLY RETURN: Invalid data.result - returning:", JSON.stringify(errorObj));
+            return errorObj;
         }
     } else {
-        console.log(`Response is bad (${response.status})`);
-        console.log(await response.text());
-        return {result: "Invalid Resolution link or task. Please check again.", error: true};
+        const errorText = await response.text();
+        console.log(`❌ Oracle simulation failed (${response.status})`);
+        console.log(errorText);
+        const errorObj = {result: `❌ Oracle feed validation failed (HTTP ${response.status}).\n\nPossible issues:\n• API endpoint is unreachable\n• API requires authentication\n• JSON path is incorrect\n\nPlease check your data source and try again.`, error: true};
+        console.log("🔴 EARLY RETURN: Response not OK - returning:", JSON.stringify(errorObj));
+        return errorObj;
     }
 
     // Get the queue for the network you're deploying on
@@ -134,5 +149,27 @@ export const customizeFeed = async (param: RegistType) => {
 
     // console.log(`Feed ${feedKeypair.publicKey} initialized: ${initSig}`);
 
-    return {error: false, feedKeypair};
+    console.log("✅ customizeFeed completed successfully");
+    const result = {error: false, feedKeypair};
+    console.log("✅ Returning result:", JSON.stringify({
+        error: result.error,
+        feedPublicKey: result.feedKeypair?.publicKey?.toBase58()
+    }));
+    return result;
+    
+    } catch (error) {
+        console.error("❌ customizeFeed ERROR CAUGHT:", error);
+        console.error("❌ Error type:", typeof error);
+        console.error("❌ Error message:", error instanceof Error ? error.message : String(error));
+        console.error("❌ Error stack:", error instanceof Error ? error.stack : 'No stack');
+        
+        const errorResult = {
+            result: `Failed to create oracle feed: ${error instanceof Error ? error.message : String(error)}`,
+            error: true
+        };
+        console.error("🔴 Returning error object:", JSON.stringify(errorResult));
+        return errorResult;
+    } finally {
+        console.log("🏁 customizeFeed function ENDED");
+    }
 } 
